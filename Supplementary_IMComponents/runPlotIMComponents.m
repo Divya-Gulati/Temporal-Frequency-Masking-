@@ -1,11 +1,10 @@
 close all;
 clear;clc;
 folderSourceString = 'E:\MonkeyData_DualTFSmallPaper\savedData';
+fieldsTocombine = [3 4 6 11:14];
 
 FileName = "Figure_IMData_0_90_sessionWise.mat";
 fullFileName = fullfile(folderSourceString,FileName);
-
-fieldsTocombine = [3 4 6 11:14];
 
 if exist(fullFileName, 'file')
     load(fullFileName); % loading respective saved data %
@@ -30,7 +29,7 @@ if exist(fullFileName_45, 'file')
 else
     saveFlag =1;
     DataFileName_45 = fullfile(folderSourceString,'SmallStimPlaid_HighRMSLFP_sessionWise_fortyFive_Microelectrode.mat');
-    saveDataForEachMonkeySeparatelyFlag_45 = 1;
+    saveDataForEachMonkeySeparatelyFlag_45 = 0;
     Figure_IMData_45 = getDataForFigure3_sessionWise(DataFileName_45,fieldsTocombine,saveDataForEachMonkeySeparatelyFlag_45);
     if saveFlag == 1
         save(fullfile(folderSourceString,FileName_45),'Figure_IMData_45');
@@ -38,3 +37,4 @@ else
 end
 
 plotFigureIM_sessionWise_45(Figure_IMData_45)
+

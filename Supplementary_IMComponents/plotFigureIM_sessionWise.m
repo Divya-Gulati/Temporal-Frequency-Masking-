@@ -9,13 +9,13 @@ FreqVals = 0:2:1998;
 
 f = figure;
 f.WindowState = 'maximized';
-plotHandles_a= getPlotHandles(15,2,[0.03 0.06 0.16 0.84],0.011,0.005);
-plotHandles_b= getPlotHandles(2,4,[0.24 0.545 0.24 0.357],0.008,0.015,0);
-plotHandles_c= getPlotHandles(2,4,[0.24 0.06 0.24 0.357],0.008,0.015,0);
+plotHandles_a= getPlotHandles(15,2,[0.03 0.06 0.16 0.85],0.011,0.005);
+plotHandles_b= getPlotHandles(2,4,[0.24 0.545 0.24 0.365],0.008,0.012,0);
+plotHandles_c= getPlotHandles(2,4,[0.24 0.06 0.24 0.365],0.008,0.012,0);
 
-plotHandles_d= getPlotHandles(15,2,[0.52 0.06 0.16 0.84],0.011,0.005);
-plotHandles_e= getPlotHandles(2,4,[0.73 0.545 0.24 0.357],0.008,0.015,0);
-plotHandles_f= getPlotHandles(2,4,[0.73 0.06 0.24 0.357],0.008,0.015,0);
+plotHandles_d= getPlotHandles(15,2,[0.52 0.06 0.16 0.85],0.011,0.005);
+plotHandles_e= getPlotHandles(2,4,[0.73 0.545 0.24 0.365],0.008,0.012,0);
+plotHandles_f= getPlotHandles(2,4,[0.73 0.06 0.24 0.365],0.008,0.012,0);
 
 tVal = TF == 15;
 FreqToPlot = 31;
@@ -70,12 +70,17 @@ for iori = 1:length(FigureData.NumElecs_ECoG)
             hold on;
             patch([FreqVals(1:FreqToPlot) fliplr(FreqVals(1:FreqToPlot))],[plaidData(1:FreqToPlot)-plaidData_sem(1:FreqToPlot) fliplr(plaidData(1:FreqToPlot)+plaidData_sem(1:FreqToPlot))],...
                 colorArray(goodColor,:),'EdgeColor','none','FaceColor',colorArray(goodColor,:),'LineWidth',1, 'FaceAlpha',0.2);
-            xlim([0 60]);ylim([0 30]);
+            xlim([0 60]);
             
             xline(15+TF(iTF),':','Linewidth',2,'color',[184 115 51]./255);
             xline(abs(15-TF(iTF)),':','Linewidth',2,'color',[92 64 51]./255);
             xticks([0 20 40 60]);
-            yticks([0 10 20 30]);
+            
+            if iori == 1
+                ylim([0 30]); yticks([0 14 28]);
+            else
+                ylim([0 30]); yticks([0 14 28]);
+            end
             
             if iTF~=length(TF)
                 set(gca,'YTickLabel',[]);
@@ -132,7 +137,7 @@ for iori = 1:length(FigureData.NumElecs_ECoG)
                     hold on;
                 end
                 limits_y = [MinScaleIMM-2 ceil(MaxScaleIMM)+7];
-                set(gca,'FontSize',9);ylim(limits_y);xticks(1:4:29);
+                set(gca,'FontSize',9);ylim(limits_y);xticks(1:4:29);yticks([-8 0 8 16 24 32]);
                 if iscale ~= 2 && iTarCon ~=1
                     set(gca,'YTickLabel',[])
                 end
@@ -145,8 +150,8 @@ for iori = 1:length(FigureData.NumElecs_ECoG)
                     set(gca,'YTickLabel',[])
                 end
                 
-                if imPlot == 2 && iscale == 1 && iTarCon ==1
-                    legend('0','6.25','12.5','25','FontSize',6,'Fontname','Courier','Fontweight','bold','location','northeast');
+                if imPlot == 2 && iscale == 2 && iTarCon ==1
+                    legend('0','6.25','12.5','25','FontSize',6,'Fontname','Courier','Fontweight','bold','location','northwest','box','off');
                 end
                 
                 if iscale == 2 && iTarCon ==1
@@ -165,17 +170,17 @@ for iori = 1:length(FigureData.NumElecs_ECoG)
                 
                 if iTarCon == length(ContrastValuesLeft)
                     if iscale == 1
-                        h = text(32,floor(MinScaleIMM)-1,'Pop. Avg LFP (M1 & M2)','Fontsize',8,'Fontname','Courier','Fontweight','bold','color','k');
+                        h = text(34,(MinScaleIMM-2),{'Pop.Avg LFP (M1 & M2)'},'Fontsize',8.5,'Fontname','Courier','Fontweight','bold','color','k');
                         set(h,'Rotation',90);
                     else
-                        h = text(32,(mean(limits_y))-3.5,'M3 - ECoG','Fontsize',8,'Fontname','Courier','Fontweight','bold','color','k');
+                        h = text(34,(mean(limits_y))-6,'M3 - ECoG','Fontsize',8.5,'Fontname','Courier','Fontweight','bold','color','k');
                         set(h,'Rotation',90);
                     end
                 end
             end
             
-            elecNum = ['N = ' num2str(NumElec(iscale))];
-            text(13,ceil(MaxScaleIMM)+6,elecNum,'Fontsize',10,'Fontname','Courier','Fontweight','bold');
+            elecNum = ['N = ' num2str(NumElec(iori))];
+            text(13,ceil(MaxScaleIMM)+5,elecNum,'Fontsize',10,'Fontname','Courier','Fontweight','bold');
         end
     end
 end
@@ -196,12 +201,12 @@ annotation(gcf,'textarrow',...
     'FontSize',18, 'color','k','FontWeight','bold', 'TextRotation',0,'Fontname','courier');
 
 annotation(gcf,'textarrow',...
-    [0.5 0.1] ,[0.955 0.5],...
+    [0.5 0.1] ,[0.957 0.5],...
     'String','D', 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',18, 'color','k','FontWeight','bold', 'TextRotation',0,'Fontname','courier');
 
 annotation(gcf,'textarrow',...
-    [0.7 0.1] ,[0.955 0.5],...
+    [0.7 0.1] ,[0.957 0.5],...
     'String','E', 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',18, 'color','k','FontWeight','bold', 'TextRotation',0,'Fontname','courier');
 
@@ -211,12 +216,12 @@ annotation(gcf,'textarrow',...
     'FontSize',18, 'color','k','FontWeight','bold', 'TextRotation',0,'Fontname','courier');
 
 annotation(gcf,'textarrow',...
-    [0.32 0.1] ,[0.93 0.5],...
+    [0.32 0.1] ,[0.94 0.5],...
     'String','{\it f_1 - f_2}', 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',16, 'color',colorArray(2,:),'FontWeight','bold', 'TextRotation',0,'Fontname','courier');
 
 annotation(gcf,'textarrow',...
-    [0.81 0.1] ,[0.95 0.5],...
+    [0.81 0.1] ,[0.96 0.5],...
     'String','{\it f_1 - f_2}', 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',16, 'color',colorArray(3,:),'FontWeight','bold', 'TextRotation',0,'Fontname','courier');
 
@@ -231,12 +236,12 @@ annotation(gcf,'textarrow',...
     'FontSize',16, 'color',colorArray(3,:),'FontWeight','bold', 'TextRotation',0,'Fontname','courier');
 
 annotation(gcf,'textarrow',...
-    [0.11 0.1] ,[0.94 0.5],...
+    [0.11 0.1] ,[0.945 0.5],...
     'String','Parallel', 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',16, 'color',colorArray(2,:),'FontWeight','bold', 'TextRotation',0,'Fontname','courier');
 
 annotation(gcf,'textarrow',...
-    [0.555 0.1] ,[0.955 0.5],...
+    [0.555 0.1] ,[0.96 0.5],...
     'String','Orthogonal', 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',16, 'color',colorArray(3,:),'FontWeight','bold', 'TextRotation',0,'Fontname','courier');
 

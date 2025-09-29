@@ -1,4 +1,4 @@
-function plotFigure8_ConTFSize(FigureData,TFValues,ContrastValues,FitQualityCutOff,useAvgFitFlag)
+function plotFigure8_ConTFSize(FigureData,TFValues,ContrastValues,FitQualityCutOff,useAvgFitFlag,monkeyNames)
 
 if ~exist('useAvgFitFlag','var');    useAvgFitFlag = 1; end
 
@@ -116,12 +116,17 @@ changeInAmp_ElecAvg =FigureData.averageChangeInAmp;
 changeInAmp_ElecSem = FigureData.semChangeInAmp;
 
 if useAvgFitFlag
-    changeInAmpFits_ElecAvg =squeeze(FigureData.TFResponse{1, 3});
+    changeInAmpFits_ElecAvg =squeeze(FigureData.TFResponse{1, end});
     clearvars Peaks indices
-    [Peaks,indices] = (max(squeeze(FigureData.TFResponse{1, 3}),[],3));
+    [Peaks,indices] = (max(squeeze(FigureData.TFResponse{1, end}),[],3));
 else
-    TF_ResponseMerge = vertcat(FigureData.TFResponse{1, 1},FigureData.TFResponse{1, 2});
-    FitQualityMerged = vertcat(FigureData.FitQuality{1, 1},FigureData.FitQuality{1, 2});
+    if size(FigureData.TFResponse,2)>1
+        TF_ResponseMerge = vertcat(FigureData.TFResponse{1, 1},FigureData.TFResponse{1, 2});
+        FitQualityMerged = vertcat(FigureData.FitQuality{1, 1},FigureData.FitQuality{1, 2});
+    else
+        TF_ResponseMerge = FigureData.TFResponse{1, 1};
+        FitQualityMerged = FigureData.FitQuality{1, 1};
+    end
     goodFitElecs = repmat(FitQualityMerged  >= 0.75,[1,1,1,size(TF_ResponseMerge,4)]);
     goodFitElecs =  goodFitElecs.*1;
     goodFitElecs(goodFitElecs == 0) = NaN;
@@ -169,10 +174,14 @@ for jsize = 1:size(changeInAmp_ElecAvg,1)
     
     if iplot(jsize) == 1
         ylabel ('Change in Amplitude at {\it 2f} (\muV)');%,'FontWeight','bold'
-        string =" Pop. Avg (N=" + FigureData.LengthOfAllElecs+ ")";
-        text(1,ymaxVal-2,string,'color','k','FontWeight','bold','fontname','courier');
+        if size(monkeyNames,2) >1
+            string =" Pop. Avg (N=" + FigureData.LengthOfAllElecs+ ")";
+        else
+            string =" N=" + FigureData.LengthOfAllElecs;
+        end
+        text(1,ymaxVal-2.5,string,'color','k','FontWeight','bold','fontname','courier');
     else
-        legend(Cons,'location','northeast','Fontsize',9.5,'fontname','courier','FontWeight','bold');%legend('boxoff');
+        legend(Cons,'location','northwest','Fontsize',9.5,'fontname','courier','FontWeight','bold');legend('boxoff');
     end
     
 
@@ -185,18 +194,22 @@ newColors_dots =flipud(gray(7));
 newColors_dots =newColors_dots(4:7,:);
 
 Cons = {'12.5%','25%','50%','100%'};
-Monkeys = {'M1','M2'};
+Monkeys = monkeyNames;
+
 vec = [-Inf:-Inf+20];
 for icon = 1:length(Cons)
     hold on;
     plot(vec,'color',newColors_dots(icon,:),'lineWidth',20);
 end
 
-scatter(Inf,Inf,1,'d','MarkerFaceColor','w','MarkerEdgeColor','k');
+
 scatter(Inf,Inf,1,'o','MarkerFaceColor','w','MarkerEdgeColor','k');
+scatter(Inf,Inf,1,'square','MarkerFaceColor','w','MarkerEdgeColor','k');
+
+
 
 AllLargeStim = []; AllSmallStim = [];
-for iMonkey = 1:2
+for iMonkey = 1:size(FigureData.TFResponse,2)-1
     dataInput = FigureData.TFResponse{iMonkey};
     FitQuality =FigureData.FitQuality{iMonkey};
     [SmallStim,LargeStim] = LargeSmallComparison(dataInput,FitQuality,FitQualityCutOff);
@@ -204,9 +217,9 @@ for iMonkey = 1:2
     for i= 2:size(LargeStim,2) % number of contrasts - removing zero percent
         hold on;
         if iMonkey == 1
-            scatter(LargeStim(:,i),SmallStim(:,i),150,'d',"filled",'LineWidth',1,'MarkerEdgeColor','k','MarkerFaceColor',newColors_dots(i-1,:));
+            scatter(LargeStim(:,i),SmallStim(:,i),120,'o',"filled",'LineWidth',1,'MarkerEdgeColor','k','MarkerFaceColor',newColors_dots(i-1,:));
         else
-            scatter(LargeStim(:,i),SmallStim(:,i),150,"filled",'LineWidth',1,'MarkerEdgeColor','k','MarkerFaceColor',newColors_dots(i-1,:));
+            scatter(LargeStim(:,i),SmallStim(:,i),150,'square',"filled",'LineWidth',1,'MarkerEdgeColor','k','MarkerFaceColor',newColors_dots(i-1,:));
         end
         hold on;
     end   
@@ -216,10 +229,9 @@ end
 
 LargeStimVals =  reshape(AllLargeStim(:,[2:5]),1,[]);
 SmallStimVals = reshape(AllSmallStim(:,[2:5]),1,[]);
-[pValues,rejectVals] = signrank(LargeStimVals,SmallStimVals,'tail','right');
-if rejectVals== 1
-    FinalVals = pValues;
-end
+[pValues] = signrank(LargeStimVals,SmallStimVals,'tail','right');
+
+FinalVals = pValues;
 string = ['p = ' num2str(FinalVals)];
 text(12,1.5,string,'color','k','FontWeight','bold','fontname','courier','Fontsize',12);
 
@@ -231,7 +243,7 @@ xlim([1 25]);set(gca,'Yscale','log') ;
 ylabel('Small Stimuli Preferred TF (Hz)');%,'FontName','Courier','FontWeight','bold'
 xlabel('Full-field Stimuli Preferred TF (Hz)','VerticalAlignment','top','HorizontalAlignment','center');%,'Position',[4 0.33],,'FontWeight','bold'
 
-legend([Cons Monkeys],'location','northwest','Fontsize',11,'fontname','courier','FontWeight','bold');%legend('boxoff');
+legend([Cons Monkeys],'location','northwest','Fontsize',11,'fontname','courier','FontWeight','bold');legend('boxoff');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -7,10 +7,11 @@
 %%%%  Stim Duration 800-700, white fixation dot
 %%% but for saving we are using only 5*8
 
-%%%% dona has two sizes ran in the same protocol - 2 sessions
+%%%% dona has two sizes -- ran in the same protocol - 2 sessions
 %%%% 1500-1500, black fixation dot, 5Con*8TF
 %%%% 060723 - GRF_001
 %%%% 120624 - GRF_002_GRF_003_GRF_004_GRF_005_GRF_006 - special protocols
+%%%% (each protocol had like 4-5 blocks so to get 20-25 blocks all protocols were combined)
 %%%% used for combining and then bad Trials were ran
 
 %%% refer to protocolInformationConTF.m for more information %%%
@@ -53,9 +54,9 @@ ConsiderHighRMSSpikeFlag = 0;
 checkClearTransientFlag = 1;
 
 %%% cutoff for selecting spiking units for each monkey - 1st Total spikes
-%%% in that session, 2nd - SNR Value of the segment shape, 3rd - Delta
-%%% Firing rate - spikes/sec (Stim-Baseline)
-allCutOffs = {[0 0 0];[5000 1.2 1.3]}; % M1,M2
+%%% in that session, 2nd - SNR Value of the segment shape, 3rd -
+%%% Firing rate - spikes/sec (Stim period)
+allCutOffs = {[0 0 0];[10000 1.2 1 1]}; % M1,M2
 %%%  M1 doesn't have any spiking elecs
 
 
@@ -76,7 +77,7 @@ for iName = 1:length(monkeyNames)
     end
     
     if saveLFPFlag == 1
-        FileName = convertCharsToStrings(monkeyName) +"_ConTF_highRMSLFP_sessionWise_" + gridType+".mat";
+        FileName = convertCharsToStrings(monkeyID{iName}) +"_ConTF_highRMSLFP_sessionWise_" + gridType+".mat";
         save(fullfile(fileSaveDestination,FileName),'LFPResults');
     end
     

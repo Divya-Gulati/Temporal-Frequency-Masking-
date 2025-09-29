@@ -1,8 +1,9 @@
-function Figure2Data = getDataForFigure2_sessionWise(folderSourceString)
+function Figure2Data = getDataForFigure2_sessionWise(DataFileName_FullScreen,DataFileName_SmallStim,MonkeyNumber)
 %%% loading full screen data file %%%%
 clearvars Results
-Results = load(fullfile(folderSourceString,'FullScreen_HighRMSLFP_sessionWise_Microelectrode.mat'));
+Results = load(DataFileName_FullScreen);
 Results = Results.Results;
+Results = Results(1, MonkeyNumber);  
 allfieldNames_FS = fieldnames(Results{1,1});
 fieldsTocombine_FS = [1:5 7];
 
@@ -12,43 +13,49 @@ for ifN = 1:length(fieldsTocombine_FS)
     name = cell2mat(allfieldNames_FS(fieldsTocombine_FS(ifN)));
 
     clearvars dataCombine
-    dataCombine = cell(1,length(Results));
+    dataCombine = cell(length(Results),2);
+    
     for iMonId = 1:length(Results)
-        clearvars temp_field temp_session tempIds tempGoodElecs
+        clearvars temp_field temp_session 
         temp_field = cell2mat(Results{1, iMonId}.(name));
         temp_session = squeeze(mean(temp_field,1,'omitNaN')); % mean of electrodes across sessions
-        tempIds = all(~isnan(temp_session),4); % removing extra electrodes - keeping only the good ones
-        tempGoodElecs = temp_session(tempIds(:,1,1),:,:,:);
-        dataCombine{iMonId} = tempGoodElecs; %%% getting data in a single variable for both monkeys %%%
+        
+        for idelta = 1:size(temp_session,2)
+            clearvars  tempdata tempIds tempGoodElecs
+            tempdata = temp_session(:,idelta,:,:);
+            tempIds = all(~isnan(tempdata),4); % removing extra electrodes - keeping only the good ones
+            tempGoodElecs = tempdata(tempIds(:,1,1),:,:,:);
+            dataCombine{iMonId,idelta} = tempGoodElecs; %%% getting data in a single variable for all monkeys %%%
+            dataMerged.NumElecsEachMonkey_FS(idelta,iMonId) = size(tempGoodElecs,1);
+        end
+        
     end
 
-    dataMergedAcrossMonkeys= cat(1,dataCombine{:}); % merging dataacross monkeys
+    dataMergedAcrossMonkeys= arrayfun(@(col) cat(1, dataCombine{:, col}), 1:2, 'UniformOutput', false); % merging data across monkeys
 
-    % taking average across electrodes
-    clearvars N_elec meanMerged semMerged
-    N_elec = size(dataMergedAcrossMonkeys,1);
-    meanMerged = squeeze(mean(dataMergedAcrossMonkeys,1));
-    semMerged = squeeze((std(dataMergedAcrossMonkeys,[],1))./sqrt(N_elec));
-
+    clearvars meanMerged semMerged
+    for jdel = 1:size(dataMergedAcrossMonkeys,2)
+        % taking average across electrodes
+        clearvars N_elec 
+        N_elec = size(dataMergedAcrossMonkeys{:,jdel},1);
+        meanMerged(jdel,:,:) = squeeze(mean(dataMergedAcrossMonkeys{:,jdel},1));
+        semMerged(jdel,:,:) = squeeze((std(dataMergedAcrossMonkeys{:,jdel},[],1))./sqrt(N_elec));
+        dataMerged.NumElecs_FS(jdel,:) = N_elec;
+    end
+    
     combName = [name '_mean_FS'];
     dataMerged.(combName) = meanMerged;
 
     semCombName = [name '_sem_FS'];
     dataMerged.(semCombName) = semMerged;
 
-    if strcmpi(name, 'ChangeInAmpNeg')
-        dataMerged.NumElecsEachMonkey_FS = [size(dataCombine{1,1},1) size(dataCombine{1, 2},1)];
-    end
-
 end
 dataMerged.freqVals_FS = Results{1, 1}.parameters{1, 1}.freqbins;
-dataMerged.NumElecs_FS = N_elec;
 
 %%% loading small stimulus data %%%
 clearvars Results
-Results = load(fullfile(folderSourceString,'SmallStimPlaid_HighRMSLFP_sessionWise_Microelectrode.mat'));
-Results = Results.Results(:,1:end-1); % taking only microelectrode data
-
+Results = load(DataFileName_SmallStim);
+Results = Results.Results(:,MonkeyNumber); % taking only microelectrode data
 allfieldNames_Small = fieldnames(Results{1,1});
 fieldsTocombine_Small =[3:5 9:10];
 
@@ -61,14 +68,15 @@ for ifN = 1:length(fieldsTocombine_Small)
         name = cell2mat(allfieldNames_Small(fieldsTocombine_Small(ifN)));
 
         clearvars dataCombine
-        dataCombine = cell(1,length(Results));
-        for iMonId = 1:length(Results)
+        dataCombine = cell(1,size(Results,2));
+        for iMonId = 1:size(Results,2)
             clearvars temp_field temp_session tempIds tempGoodElecs
             temp_field = Results{idelta, iMonId}.(name);
             temp_session = squeeze(mean(temp_field,1,'omitNaN')); % mean of electrodes across sessions
             tempIds = all(~isnan(temp_session),5); % removing extra electrodes - keeping only the good ones
             tempGoodElecs = temp_session(tempIds(:,1,1),:,:,:,:);
             dataCombine{iMonId} = tempGoodElecs; %%% getting data in a single variable for both monkeys %%%
+            NumElecsEachMonkey(idelta,iMonId) = size(tempGoodElecs,1);
         end
 
         dataMergedAcrossMonkeys= cat(1,dataCombine{:}); 
@@ -87,7 +95,6 @@ for ifN = 1:length(fieldsTocombine_Small)
 
         if strcmpi(name, 'changeInAmpSubtract')
             NumElecs(idelta) = N_elec;
-            NumElecsEachMonkey(idelta,:) = [size(dataCombine{1},1) size(dataCombine{2},1)];
         end
         
     end

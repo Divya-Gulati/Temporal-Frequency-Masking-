@@ -33,7 +33,7 @@ for jIndex = 1:length(Indices) % running it for all protocol indices
             arrayType,SpikingtimeRange,spikeElecCutOffs,useCommonBadTrials,ConsiderHighRMSFlag,folderHighRMSElecs,ConsiderBadImpedanceFlag);
         clearvars  electrodeNums
         electrodeNums = ElecIds{1,1};
-    else 
+    else
         if ConsiderHighRMSFlag == 1
             rmsElecFile = fullfile(folderHighRMSElecs,monkeyName,[monkeyName gridType 'RFData.mat']);
             if exist(rmsElecFile,'file')
@@ -203,7 +203,7 @@ for jIndex = 1:length(Indices) % running it for all protocol indices
                     end
                 end
                 Results.changeInAmpNeg(iElecCount,con1,:,:)  = Results.ampDiff_spike_plaid(iElecCount,con1,:,:) - repmat(Results.ampDiff_spike_plaid(iElecCount,1,4,freqTF) ,1,1,length(Results.parameters{jIndex}.cValsUnique2),length(Results.parameters{jIndex}.tValsUnique2));
-                Results.changeInAmpSubtract(iElecCount,con1,:,:)  = Results.ampDiff_spike_plaid(iElecCount,con1,:,:) - repmat(Results.ampDiff_spike_plaid(iElecCount,con1,1,:) ,1,1,length(Results.parameters{jIndex}.cValsUnique2),1);
+                Results.changeInAmpSubtract(iElecCount,con1,:,:)  = Results.ampDiff_spike_plaid(iElecCount,con1,:,:) - repmat(Results.ampDiff_spike_plaid(iElecCount,con1,1,freqTF) ,1,1,length(Results.parameters{jIndex}.cValsUnique2),length(Results.parameters{jIndex}.tValsUnique2));
             end
             Results.parameters{jIndex}.PsthTimeAxis = timeaxis;
             Results.parameters{jIndex}.PsthFreqVals = freqVals;

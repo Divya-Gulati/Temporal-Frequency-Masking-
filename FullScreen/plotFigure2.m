@@ -8,17 +8,29 @@ plotHandles_b= getPlotHandles(1,1,[0.70 0.1 0.26 0.38],0.01,0.095);
 
 colorArray = [0.4 0.4 0.4; 0.7 0.03 0.3; 1 0.54 0.15];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+TFtoCover = 1:2:29;
 TF = 15;
+FreqToPlot = 61;
+allTfs_FS = 1:1:29;
+tVal = allTfs_FS == TF;
 %%%% plotting fft - FS %%%%
-gratingData = squeeze(mean(Figure2Data.fftST_grating_mean_FS(:,TF,:),1))'; % mean across both orientations
-gratingDataSem = squeeze(mean(Figure2Data.fftST_grating_sem_FS(:,TF,:),1))';
+gratingParallelData = squeeze(mean(Figure2Data.fftST_grating_mean_FS(1,tVal,:),1))'; % 0
+gratingParallelDataSem = squeeze(mean(Figure2Data.fftST_grating_sem_FS(1,tVal,:),1))';
+
+gratingOrthogonallData = squeeze(mean(Figure2Data.fftST_grating_mean_FS(2,tVal,:),1))'; % 90
+gratingOrthogonalDataSem = squeeze(mean(Figure2Data.fftST_grating_sem_FS(2,tVal,:),1))';
+
 FreqVals = Figure2Data.freqVals_FS;
 Freq = FreqVals == 2*TF;
 
-TFtoCover = 1:2:29;
-FreqToPlot = 61;
-
 for idel = 1:size(Figure2Data.fftST_plaid_mean_FS,1)
+    if idel == 1
+        gratingData = gratingParallelData;
+        gratingDataSem =gratingParallelDataSem;
+    else
+        gratingData = gratingOrthogonallData;
+        gratingDataSem =gratingOrthogonalDataSem;
+    end
     for iTF = 1:length(TFtoCover)
         subplot(plotHandles_c(iTF,idel))
         
@@ -45,7 +57,7 @@ for idel = 1:size(Figure2Data.fftST_plaid_mean_FS,1)
         xline(2*TF,'k:');
         text(40,20, [num2str(round(deltaChange,2)) '\muV'],'FontSize',8.5,'FontName','courier','Fontweight','bold');
         xticks([0 10 20 30 40 50]);
-        yticks([0 10 20 30]);
+        yticks([0 10 20]);
         
         if iTF~=length(TFtoCover)
             set(gca,'YTickLabel',[]);
@@ -77,13 +89,13 @@ for idel = 1:size(Figure2Data.fftST_plaid_mean_FS,1)
 end
 
 %%%% plotting fft - SmallStim %%%%
-TFtoCoverSmall = 1:2:29;
-tVal = TFtoCoverSmall == TF;
-gratingParallelData = squeeze((Figure2Data.fftST_plaid_mean_parallel_small(1,4,tVal,:)))'; 
-gratingParallelDataSem = squeeze(mean(Figure2Data.fftST_plaid_sem_parallel_small(1,4,tVal,:),1))';
+tVal_Small = TFtoCover == TF;
+clearvars gratingParallelData gratingParallelDataSem gratingOrthogonallData gratingOrthogonalDataSem
+gratingParallelData = squeeze((Figure2Data.fftST_plaid_mean_parallel_small(4,1,tVal_Small,:)))'; 
+gratingParallelDataSem = squeeze(Figure2Data.fftST_plaid_sem_parallel_small(4,1,tVal_Small,:))';
 
-gratingOrthogonallData = squeeze((Figure2Data.fftST_plaid_mean_orthogonal_small(1,4,tVal,:)))'; 
-gratingOrthogonalDataSem = squeeze(mean(Figure2Data.fftST_plaid_sem_orthogonal_small(1,4,tVal,:),1))';
+gratingOrthogonallData = squeeze((Figure2Data.fftST_plaid_mean_orthogonal_small(4,1,tVal_Small,:)))'; 
+gratingOrthogonalDataSem = squeeze(Figure2Data.fftST_plaid_sem_orthogonal_small(4,1,tVal_Small,:))';
 
 FreqValsSmall = Figure2Data.freqVals_Small;
 FreqSmall = FreqValsSmall == 2*TF;
@@ -104,7 +116,7 @@ for idel = 1:2
     end
     
     
-    for iTF = 1:length(TFtoCoverSmall)
+    for iTF = 1:length(TFtoCover)
         subplot(plotHandles_a(iTF,idel))
         
         plot(FreqValsSmall(1:FreqToPlotSmall),gratData(1:FreqToPlotSmall),'color',colorArray(1,:),'Linewidth',1.5);
@@ -122,17 +134,17 @@ for idel = 1:2
         hold on;
         patch([FreqValsSmall(1:FreqToPlotSmall) fliplr(FreqValsSmall(1:FreqToPlotSmall))],[plaidData(1:FreqToPlotSmall)-plaidDataSem(1:FreqToPlotSmall) fliplr(plaidData(1:FreqToPlotSmall)+plaidDataSem(1:FreqToPlotSmall))],...
             colorArray(idel+1,:),'EdgeColor','none','FaceColor',colorArray(idel+1,:),'LineWidth',1, 'FaceAlpha',0.2);
-        xlim([0 60]);ylim([0 8.5]);
+        xlim([0 60]);ylim([0 10]);
         
         hold on;
         errorbar(2*TF+3,deltaChangeMean,abs(deltaChange/2),'r','LineWidth',1.2,'CapSize',3);
-        xline(2*TFtoCoverSmall(iTF),'m:');
+        xline(2*TFtoCover(iTF),'m:');
         xline(2*TF,'k:');
-        text(40,7, [num2str(round(deltaChange,2)) '\muV'],'FontSize',8.5,'FontName','courier','Fontweight','bold');
+        text(40,8, [num2str(round(deltaChange,2)) '\muV'],'FontSize',8.5,'FontName','courier','Fontweight','bold');
         xticks([0 10 20 30 40 50]);
         yticks([0 4 8]);
         
-        if iTF~=length(TFtoCoverSmall)
+        if iTF~=length(TFtoCover)
             set(gca,'YTickLabel',[]);
             set(gca,'XTickLabel',[]);
         end
@@ -143,7 +155,7 @@ for idel = 1:2
             ax = gca;
             ax.YAxis(1).Color = 'k';
             ax.YAxis(2).Color = 'w';
-            ylabel(gca, +TFtoCoverSmall(iTF),'Color','k','FontWeight','bold','FontName','courier');
+            ylabel(gca, +TFtoCover(iTF),'Color','k','FontWeight','bold','FontName','courier');
         end
         box 'off';
 
@@ -167,7 +179,7 @@ dataToPlot_AD_FS = Figure2Data.ChangeInAmpNeg_mean_FS;
 semToPlot_AD_FS = Figure2Data.ChangeInAmpNeg_sem_FS;
 
 for isize = 1:size(dataToPlot_AD_FS,1)
-    errorbar(1:1:29,dataToPlot_AD_FS(isize,:),...
+    errorbar(allTfs_FS,dataToPlot_AD_FS(isize,:),...
         semToPlot_AD_FS(isize,:),semToPlot_AD_FS(isize,:),'d-','color',colorArray(isize+1,:)...
         ,'capsize',2,"MarkerFaceColor",colorArray(isize+1,:),'lineWidth',1.5);
     hold on;
@@ -175,9 +187,10 @@ end
 
 
 title ('Full-field Stimuli','color','k','FontSize',12,'FontName','courier','Fontweight','bold');
-box 'off';ylim([-12 12]);
-text(1,10,[ 'N = ' num2str(Figure2Data.NumElecs_FS)],'FontName','courier','FontSize',11,'FontWeight','bold');
-ylabel('Change in Amplitude at 30Hz (\muV)');
+box 'off';ylim([-12 15]);
+text(1,12,[ 'N = ' num2str(Figure2Data.NumElecs_FS(1))],'FontName','courier','FontSize',11,'color',colorArray(2,:),'FontWeight','bold');
+text(1,10,[ 'N = ' num2str(Figure2Data.NumElecs_FS(2))],'FontName','courier','FontSize',11,'color',colorArray(3,:),'FontWeight','bold');
+ylabel({'Change in Amplitude at 30Hz (\muV)','Plaid - Grating'});%ylabel('Change in Amplitude at 30Hz (\muV)');
 
 subplot(plotHandles_b(1))
 dataToPlot_parallel_ampDiff = squeeze(Figure2Data.changeInAmpSubtract_mean_parallel_small(4,4,:));
@@ -194,11 +207,11 @@ hold on;
 title ('Small Stimuli','color','k','FontSize',12,'FontName','courier','Fontweight','bold');
 box 'off';
 
-ylim([-4 3.5]);
-text(1,2.8,[ 'N = ' num2str(Figure2Data.NumElecs_Small(1))],'FontName','courier','FontSize',11,'color',colorArray(2,:),'FontWeight','bold');
-text(1,2.3,[ 'N = ' num2str(Figure2Data.NumElecs_Small(2))],'FontName','courier','FontSize',11,'color',colorArray(3,:),'FontWeight','bold');
+ylim([-4 3]);
+text(1,2.5,[ 'N = ' num2str(Figure2Data.NumElecs_Small(1))],'FontName','courier','FontSize',11,'color',colorArray(2,:),'FontWeight','bold');
+text(1,2,[ 'N = ' num2str(Figure2Data.NumElecs_Small(2))],'FontName','courier','FontSize',11,'color',colorArray(3,:),'FontWeight','bold');
 xlabel('Temporal Frequency of Mask (Hz)');
-ylabel('Change in Amplitude at 30Hz (\muV)');
+ylabel({'Change in Amplitude at 30Hz (\muV)','Plaid - Grating'});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 annotation(gcf,'textarrow',...

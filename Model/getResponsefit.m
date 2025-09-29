@@ -1,6 +1,7 @@
-function [d,estData] = getResponsefit(params,cList,dataToBeFitted,modelNum,TargetFrequency,maskTFList)
+function [d,estData] = getResponsefit(params,cListLeft,cListRight,dataToBeFitted,modelNum,TargetFrequency,maskTFList)
 
-numContrasts = length(cList);
+numContrastsLeft = length(cListLeft);
+numContrastsRight = length(cListRight);
 sigma = params(1); % sigma(f_target)
 n = 2;
 Lamp = params(2);
@@ -9,11 +10,11 @@ if modelNum==1 %Untuned normalization model- Salelkar and Ray 2020
     
     S = params(end-13:end); % suppression for each mask frequency
     numTFs = length(S);
-    estData = zeros(numContrasts,numContrasts,numTFs);
-    for icT = 1:numContrasts % target contrast
-        cT = cList(icT);
-        for iM = 1:numContrasts % mask contrast
-            cM = cList(iM);
+    estData = zeros(numContrastsLeft,numContrastsRight,numTFs);
+    for icT = 1:numContrastsLeft % target contrast
+        cT = cListLeft(icT);
+        for iM = 1:numContrastsRight % mask contrast
+            cM = cListRight(iM);
             for iTF=1:numTFs
                 Lt = Lamp;
                 estData(icT,iM,iTF) = ((Lt.*cT)./sqrt((sigma).^2+cT.^2+S(iTF).*(cM.^2))).^n; % Equation 3
@@ -37,14 +38,14 @@ elseif modelNum==2 %New Model
     timeVals = 0:(1/Fs):(T-(1/Fs)); % time vector
  
     numTFs = length(maskTFList);
-    estData = zeros(numContrasts,numContrasts,numTFs);
+    estData = zeros(numContrastsLeft,numContrastsRight,numTFs);
     
-    for icT = 1:numContrasts % target contrast
-        cT = cList(icT);
+    for icT = 1:numContrastsLeft % target contrast
+        cT = cListLeft(icT);
         targetWave = sin(2 * pi * TargetFrequency * timeVals);
         
-        for iM = 1:numContrasts % mask contrast
-            cM = cList(iM);
+        for iM = 1:numContrastsRight % mask contrast
+            cM = cListRight(iM);
             
             for iTF=1:numTFs
                 

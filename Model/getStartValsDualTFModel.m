@@ -2,12 +2,16 @@ function [startPoint,lowerbound,upperbound] = getStartValsDualTFModel(numTFs,mod
 
 if modelNum==1 % Free parameters sigma, exponent, supression values; Untuned normalization model- Salelkar and Ray 2020
     
-    sigmaStart = 0.25;
-    LampStart = 2.5;
+    if strcmpi(MonkeyID,'SPK')
+        sigmaStart = 0.3;
+        LampStart = 5;
+    else
+        sigmaStart = 0.25;
+        LampStart = 2.5;
+    end
     lowerbound_supression= zeros(1,numTFs);
     upperbound_supression= 35*ones(1,numTFs);
     SuppressionVals = ones(1,numTFs);
-    
     startPoint = [sigmaStart LampStart SuppressionVals];
     lowerbound = [0.1 1 lowerbound_supression];
     upperbound = [4 15 upperbound_supression];
@@ -16,7 +20,7 @@ elseif modelNum==2
     
     if strcmpi(MonkeyID,'M3')
         
-        lowerbound = [0 1 1 0 0 0.1];
+        lowerbound = [0.1 1 1 0 0 0.1];
         upperbound = [4 15 40 Inf Inf 1];
         
         if Delta == 0
@@ -62,6 +66,34 @@ elseif modelNum==2
             scalingFactor = 0.7;
         end
         
+    elseif strcmpi(MonkeyID,'SPK')
+        
+        lowerbound = [0.1 1 1 0 0 0.1];
+        upperbound = [4 15 40 Inf Inf 1];
+        
+        if Delta == 0
+            LampStart = 5;
+            sigmaStart = 0.15;
+            cutOffStart = 9;
+            alpha1Start = 12;
+            alpha2Start = 0.00000000000000001;
+            scalingFactor =0.15;
+        elseif Delta == 90
+            LampStart = 3;
+            sigmaStart = 0.15;
+            cutOffStart = 20;
+            alpha1Start = 0.00000000000000001;
+            alpha2Start = 20;
+            scalingFactor = 0.8;
+        else
+            LampStart = 2.5;
+            sigmaStart = 0.3;
+            cutOffStart = 25;
+            alpha1Start = 0.000000000000000001;
+            alpha2Start = 6;
+            scalingFactor = 0.75;
+        end
+        
     elseif strcmpi(MonkeyID,'M2')
         lowerbound = [0.1 1 1 0 0 0.1];
         upperbound = [4 15 40 Inf Inf 1];
@@ -87,6 +119,26 @@ elseif modelNum==2
             alpha1Start = 0.000000000000000001;
             alpha2Start = 6;
             scalingFactor = 0.75;
+        end
+        
+    elseif strcmpi(MonkeyID,'EEG')
+        lowerbound = [0.1 1 1 0 0 0.1];
+        upperbound = [4 15 40 Inf Inf 1];
+        
+        if Delta == 0
+            LampStart = 2;
+            sigmaStart = 0.2;
+            cutOffStart = 7.5;
+            alpha1Start = 5;
+            alpha2Start = 0.00000000000000001;
+            scalingFactor =0.6;
+        elseif Delta == 90
+            LampStart = 4;
+            sigmaStart = 0.35;
+            cutOffStart = 25;
+            alpha1Start = 0.00000000000000001;
+            alpha2Start = 20;
+            scalingFactor = 0.7;
         end
     end
     

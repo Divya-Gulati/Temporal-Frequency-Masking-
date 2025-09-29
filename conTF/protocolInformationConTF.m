@@ -2,6 +2,8 @@
 
 function  [expDates,protocolNames,arrayType,timeRange,arraysToSave,TotalElecs,conToSave,tfToSave] = protocolInformationConTF(monkeyName,gridType)
 
+conToSave = [0 12.5 25 50 100];
+tfToSave = [0 1 2 4 8 16 32 50];
 %%%%%%%%%%%%%%%%%%%%%% coco, Microelectrode %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if strcmp(monkeyName,'coco') && strcmpi(gridType,'Microelectrode')
@@ -22,6 +24,5 @@ if strcmp(monkeyName,'dona') && strcmpi(gridType,'Microelectrode')
     expDates{2} = '120624'; protocolNames{2} = 'GRF_002_GRF_003_GRF_004_GRF_005_GRF_006'; % special protocol required for merging
     TotalElecs{2} = {(1:48);(49:96)};
 end
-
 
 end

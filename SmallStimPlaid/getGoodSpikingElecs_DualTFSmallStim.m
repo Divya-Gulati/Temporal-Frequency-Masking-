@@ -4,7 +4,7 @@ if ~exist('arrayType','var');                                      arrayType = '
 if ~exist('timeRange','var');                                     timeRange = [0.25 0.75];               end
 if ~exist('cutOffs','var');                                            cutOffs = [5000 1.5  1 0];              end
 if ~exist('useCommonBadTrials','var');                  useCommonBadTrials = 1;            end
-       
+
 folderName = fullfile(folderSourceString,'data',monkeyName,gridType,expDate,protocolName);
 folderExtract = fullfile(folderName,'extractedData');
 folderSegment = fullfile(folderName,'segmentedData');
@@ -64,7 +64,7 @@ maxConLeft = max(valsConLeft);
 ConL_num = valsConLeft == maxConLeft;
 ConR_num = valsConRight == minConRight;
 trialsparamsLeft = parameters.parameterCombinations{:,:,1,1,1,ConL_num};
-trialsparamsRight = parameters.parameterCombinations2{:,:,1,1,1,ConR_num,16};
+trialsparamsRight = parameters.parameterCombinations2{:,:,1,1,1,ConR_num,end};
 TrialsToCheck_Left= intersect(trialsparamsLeft,trialsparamsRight);
 
 %%%% adding right side trials also when left side was at 0% contrast and TF
@@ -118,7 +118,7 @@ for iArray = 1:size(electrodeList,2)
         baselineFiringRate = mean(psthVals(blPos));
         stimulusFiringRate = mean(psthVals(stPos));
         PsthFiringRate  = stimulusFiringRate - baselineFiringRate;
-
+        
         %%% saving params %%%%%%%%%
         params{iArray}(ielec).SpikesOverall = SpikesOverall;
         params{iArray}(ielec).snrValues = snrVal;
@@ -137,20 +137,20 @@ for iArray = 1:size(electrodeList,2)
             TransBaseFiringRate = mean(BaseNumTransSpikes)./diff(transBaseTimeRange);
             TransFiringRate = (TransStimFiringRate >= 1.5*(TransBaseFiringRate));
             params{iArray}(ielec).TransFiringRate = TransFiringRate;
-        end  
+        end
         
     end
 end
 
 
 
-ElecIds = cell(1,size(params,2)); 
+ElecIds = cell(1,size(params,2));
 for isize = 1:size(params,2)
     electrodes = [params{1,isize}.ElecID];
     if checkClearTransientFlag
-        indices = ([params{1,isize}.SpikesOverall]>= cutOffs(1) & [params{1,isize}.snrValues] >= cutOffs(2)  & round([params{1,isize}.StimFiringRate]) >= cutOffs(3) & ([params{1,isize}.TransFiringRate]) == 1);
+        indices = ([params{1,isize}.SpikesOverall]>= cutOffs(1) & [params{1,isize}.snrValues] >= cutOffs(2)  & ([params{1,isize}.StimFiringRate]) >= cutOffs(3) & ([params{1,isize}.TransFiringRate]) == 1);
     else
-        indices = ([params{1,isize}.SpikesOverall]>= cutOffs(1) & [params{1,isize}.snrValues] >= cutOffs(2) & ([params{1,isize}.FiringRate]) >= cutOffs(3));
+        indices = ([params{1,isize}.SpikesOverall]>= cutOffs(1) & [params{1,isize}.snrValues] >= cutOffs(2) & ([params{1,isize}.StimFiringRate]) >= cutOffs(3));
     end
     ElecIds{isize} = electrodes(indices);
 end

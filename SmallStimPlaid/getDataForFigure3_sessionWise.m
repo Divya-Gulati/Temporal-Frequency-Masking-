@@ -1,5 +1,5 @@
 function dataMerged = getDataForFigure3_sessionWise(DataFileName,fieldsTocombine,saveDataForEachMonkeySeparatelyFlag)
-%%% loading full screen data file %%%%
+%%%%%%%%%%%%%%%%%%%%%%%
 clearvars Results
 Results = load(DataFileName);
 
@@ -32,8 +32,8 @@ for ifN = 1:length(fieldsTocombine_Small)
         % taking average across electrodes
         clearvars N_elec meanMerged semMerged
         N_elec = size(dataMergedAcrossMonkeys,1);
-        meanMerged = squeeze(mean(dataMergedAcrossMonkeys,1));
-        semMerged = squeeze((std(dataMergedAcrossMonkeys,[],1))./sqrt(N_elec));
+        meanMerged = squeeze(mean(dataMergedAcrossMonkeys,1,'omitNaN'));
+        semMerged = squeeze((std(dataMergedAcrossMonkeys,[],1,'omitNaN'))./sqrt(N_elec));
         NumElecs(idelta) = N_elec;
         
         clearvars combName semCombName 
@@ -62,19 +62,18 @@ for ifN = 1:length(fieldsTocombine_Small)
  
         if saveDataForEachMonkeySeparatelyFlag == 1
         %%% saving things for each monkey separately also %%%
-        clearvars monkCombName1 monkCombName2 monkCombNameSem1 monkCombNameSem2
+        clearvars monkCombName1 monkCombName2 monkCombNameSem1 monkCombNameSem2 
         NumElecsMonkeys(1,idelta) = size(dataCombine{1},1);
         monkCombName1 = [name '_mean_M1'];
         monkCombNameSem1 = [name '_sem_M1'];
         dataM1 = dataCombine{1};
         dataMerged.(monkCombName1)(idelta,:,:,:,:) = squeeze(mean(dataM1,1)); % averaging across Elecs
         dataMerged.(monkCombNameSem1)(idelta,:,:,:,:) = squeeze((std(dataM1,[],1))./sqrt(NumElecsMonkeys(1,idelta)));
-        
         if size(LFPResults,2)>1
             NumElecsMonkeys(2,idelta) = size(dataCombine{2},1);
             monkCombName2 = [name '_mean_M2'];
             monkCombNameSem2 = [name '_sem_M2'];
-            dataM2 = dataCombine{2};
+            dataM2= dataCombine{2};
             dataMerged.(monkCombName2)(idelta,:,:,:,:) = squeeze(mean(dataM2,1)); % averaging across Elecs
             dataMerged.(monkCombNameSem2)(idelta,:,:,:,:) = squeeze((std(dataM2,[],1))./sqrt(NumElecsMonkeys(2,idelta)));
         end
@@ -87,9 +86,7 @@ dataMerged.NumElecs_ECoG = NumElecs_ECoG;
 if saveDataForEachMonkeySeparatelyFlag == 1
     dataMerged.NumElecs_M1 = NumElecsMonkeys(1,:);
     if size(LFPResults,2)>1
-        dataMerged.NumElecs_M2 = NumElecsMonkeys(2,:);
+         dataMerged.NumElecs_M2 = NumElecsMonkeys(2,:);
     end
 end
-
-clearvars Results
 end

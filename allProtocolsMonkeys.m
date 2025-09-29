@@ -18,13 +18,16 @@ taskNames{7} = 'DualTFFullScreen';   monkeyNames{7} = 'alpaH'; expDates{7} = '20
 % Target TF -15; Con- 0 50; Delta- 0 90
 taskNames{8} = 'DualTFFullScreen';  monkeyNames{8} = 'coco';    expDates{8} = '100421';     protocolNames{8} = 'GRF_002';     stimTypes{8} = 3;  arrayTypes{8} = 'Single'; arraysToSave{8} = {[]}; 
 
-% Target TF -15; Con 0 6.25 12.5 25
-taskNames{9} = 'DualTFSmall';          monkeyNames{9} = 'coco';    expDates{9} = '280321';     protocolNames{9} = 'GRF_004';     stimTypes{9} = 4;   arrayTypes{9} = 'Single'; arraysToSave{9} = {[]}; %Delta 0; 
-taskNames{10} ='DualTFSmall';        monkeyNames{10} = 'coco';   expDates{10} = '290321';  protocolNames{10} = 'GRF_003';   stimTypes{10} = 4; arrayTypes{10} = 'Single'; arraysToSave{10} = {[]}; %Delta 90;
+% Target TF -15; Con 0 6.25 12.5 25 %Delta 0; 
+taskNames{9} = 'DualTFSmall';          monkeyNames{9} = 'coco';    expDates{9} = '280321';     protocolNames{9} = 'GRF_004';     stimTypes{9} = 4;   arrayTypes{9} = 'Single'; arraysToSave{9} = {[]}; 
+% Target TF -15; Con 0 6.25 12.5 25 Delta 90;
+taskNames{10} ='DualTFSmall';        monkeyNames{10} = 'coco';   expDates{10} = '290321';  protocolNames{10} = 'GRF_003';   stimTypes{10} = 4; arrayTypes{10} = 'Single'; arraysToSave{10} = {[]}; 
 
 % 5 Con 8TF
-taskNames{11} = 'ConTFSize';           monkeyNames{11} = 'coco';   expDates{11} = '220421';  protocolNames{11} = 'GRF_002';   stimTypes{11} = 4; arrayTypes{11} = 'Single'; arraysToSave{11} = {[]}; % Full screen stimulus
-taskNames{12} = 'ConTFSize';           monkeyNames{12} = 'coco';   expDates{12} = '220421';  protocolNames{12} = 'GRF_003';   stimTypes{12} = 4; arrayTypes{12} = 'Single'; arraysToSave{12} = {[]}; % Small Stimulus
+% Full screen stimulus
+taskNames{11} = 'ConTFSize';           monkeyNames{11} = 'coco';   expDates{11} = '220421';  protocolNames{11} = 'GRF_002';   stimTypes{11} = 4; arrayTypes{11} = 'Single'; arraysToSave{11} = {[]}; 
+% Small Stimulus
+taskNames{12} = 'ConTFSize';           monkeyNames{12} = 'coco';   expDates{12} = '220421';  protocolNames{12} = 'GRF_003';   stimTypes{12} = 4; arrayTypes{12} = 'Single'; arraysToSave{12} = {[]}; 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Target TF -15; Con- 0 50; Delta- 0 90
@@ -58,5 +61,15 @@ taskNames{31} = 'ConTFSize';              monkeyNames{31} = 'dona';   expDates{3
 % protocols were combined together offline - as monkey was stopping in the middle
 % of the task - that's why a long name
 taskNames{32} = 'ConTFSize';              monkeyNames{32} = 'dona';   expDates{32} = '120624';  protocolNames{32} = 'GRF_002_GRF_003_GRF_004_GRF_005_GRF_006';   stimTypes{32} = 3; arrayTypes{32} = 4;arraysToSave{32} = 'V1'; 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Target TF -15; Con- 0 50; Delta- 0 ; Con 0 6.25 12.5 25 % Full Screen Multiple Contrasts  % (with EEG)
+taskNames{34} = 'DualTFFullScreen_MC';  monkeyNames{34} = 'dona';   expDates{34} = '180525';  protocolNames{34} = 'GRF_001';   stimTypes{34} = 4;  arrayTypes{34} = 'EEG'; arraysToSave{34} = 'EEG'; 
+taskNames{35} = 'DualTFFullScreen_MC';  monkeyNames{35} = 'jojo';     expDates{35} = '190525';  protocolNames{35} = 'GRF_001';   stimTypes{35} = 4;  arrayTypes{35} = 'EEG'; arraysToSave{35} = 'EEG'; 
+
+% Target TF -15; Con- 0 50; Delta- 90  % Full Screen Multiple Contrasts % (with EEG)
+taskNames{36} = 'DualTFFullScreen_MC';  monkeyNames{36} = 'jojo';     expDates{36} = '200525';  protocolNames{36} = 'GRF_001';   stimTypes{36} = 4;  arrayTypes{36} = 'EEG'; arraysToSave{36} = 'EEG'; 
+taskNames{37} = 'DualTFFullScreen_MC';  monkeyNames{37} = 'dona';   expDates{37} = '250525';  protocolNames{37} = 'GRF_001';   stimTypes{37} = 4;  arrayTypes{37} = 'EEG'; arraysToSave{37} = 'EEG'; 
+
 
 end

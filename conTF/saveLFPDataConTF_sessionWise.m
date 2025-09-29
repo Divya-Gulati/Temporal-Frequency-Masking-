@@ -90,7 +90,7 @@ for idate = 1:length(expDates)
         parameters.TFSaved = valsTF;
         
         %%%%%%%%%% getting the final electrodes to run %%%%%%%%%%%
-        electrodeList = getFinalGoodElectrodes(idate,arrayType,arraysToSave,rmsElecs,badImpedanceElecs,badElecs,TotalElecs);
+        electrodeList = getFinalGoodElectrodes(idate,monkeyName,arrayType,arraysToSave,rmsElecs,badImpedanceElecs,badElecs,TotalElecs);
         if goodSpikingFlag == 1
             electrodeList = getgoodSpikingElecsConTF(monkeyName,folderSegment,electrodeList(1,1),parameters,badTrials,timeRange,useCommonBadTrials,checkClearTransientFlag,cutOffs);
         end
@@ -160,6 +160,12 @@ for idate = 1:length(expDates)
                         sigmaIndex = s;
                     end
                     
+                    if strcmpi(monkeyName,'jojo')
+                        ElecOrder =electrodeList{iArray}(ielec)-48;
+                    else
+                        ElecOrder = electrodeList{iArray}(ielec);
+                    end
+                    
                     for c = 1:length(valsCon)
                         for t = 1:length(valsTF)
                             trialNums = [parameters.parameterCombinations{end,end,s,end,end,conIDs(c),TFIDs(t)}];
@@ -175,9 +181,9 @@ for idate = 1:length(expDates)
                             erp = temp_erp - mean(temp_erp(blPos));
                             
                             if iArray == 1
-                                analogDataAllElec{iArray}(SessionCount_array1,electrodeList{iArray}(ielec),sigmaIndex,c,t,:) =erp;
+                                analogDataAllElec{iArray}(SessionCount_array1,ElecOrder,sigmaIndex,c,t,:) =erp;
                             else
-                                analogDataAllElec{iArray}(SessionCount_array2,electrodeList{iArray}(ielec),sigmaIndex,c,t,:) =erp;
+                                analogDataAllElec{iArray}(SessionCount_array2,ElecOrder,sigmaIndex,c,t,:) =erp;
                             end
                             
                         end
@@ -215,13 +221,13 @@ for idate = 1:length(expDates)
                             end
                             
                             if iArray == 1
-                                elecfftST{iArray}(SessionCount_array1,electrodeList{iArray}(ielec),sigmaIndex,c,t,:) = fftST;
-                                elecfftBL{iArray}(SessionCount_array1,electrodeList{iArray}(ielec),sigmaIndex,c,t,:) = fftBL;
-                                ampDiff{iArray}(SessionCount_array1,electrodeList{iArray}(ielec),sigmaIndex,c,t) = ((fftST(fidxTF(t) ))-(fftBL(fidxTF(t))));
+                                elecfftST{iArray}(SessionCount_array1,ElecOrder,sigmaIndex,c,t,:) = fftST;
+                                elecfftBL{iArray}(SessionCount_array1,ElecOrder,sigmaIndex,c,t,:) = fftBL;
+                                ampDiff{iArray}(SessionCount_array1,ElecOrder,sigmaIndex,c,t) = ((fftST(fidxTF(t) ))-(fftBL(fidxTF(t))));
                             else
-                                elecfftST{iArray}(SessionCount_array2,electrodeList{iArray}(ielec),sigmaIndex,c,t,:) = fftST;
-                                elecfftBL{iArray}(SessionCount_array2,electrodeList{iArray}(ielec),sigmaIndex,c,t,:) = fftBL;
-                                ampDiff{iArray}(SessionCount_array2,electrodeList{iArray}(ielec),sigmaIndex,c,t) = ((fftST(fidxTF(t) ))-(fftBL(fidxTF(t))));
+                                elecfftST{iArray}(SessionCount_array2,ElecOrder,sigmaIndex,c,t,:) = fftST;
+                                elecfftBL{iArray}(SessionCount_array2,ElecOrder,sigmaIndex,c,t,:) = fftBL;
+                                ampDiff{iArray}(SessionCount_array2,ElecOrder,sigmaIndex,c,t) = ((fftST(fidxTF(t) ))-(fftBL(fidxTF(t))));
                             end
                             
                         end
@@ -263,7 +269,11 @@ function badImpedanceElecs = gethighImpedanceElecs(monkeyName,folderSourceString
 
 if strcmpi(gridType,'Microelectrode') && ConsiderBadImpedanceFlag == 1 && ~strncmp(monkeyName,'alpa',4)
     % % % find bad impedance electrodes
-    badImpedanceCutoff = 2500;
+    if strcmpi(monkeyName,'jojo')
+        badImpedanceCutoff = 3000;
+    else
+        badImpedanceCutoff = 2500;
+    end
     impedanceFileName = fullfile(folderSourceString,'data',monkeyName,gridType,expDate,'impedanceValues.mat');
     impedanceVals = load(impedanceFileName);
     badImpedanceElecs = find(impedanceVals.impedanceValues>badImpedanceCutoff) ;
@@ -315,7 +325,7 @@ for iB = 1:length(badTrialsandElecsFile)
 end
 end
 
-function electrodeList = getFinalGoodElectrodes(idate,arrayType,arraysToSave,rmsElecs,badImpedanceElecs,badElecs,TotalElecs)
+function electrodeList = getFinalGoodElectrodes(idate,monkeyName,arrayType,arraysToSave,rmsElecs,badImpedanceElecs,badElecs,TotalElecs)
 
 electrodeNum= setdiff(rmsElecs.highRMSElectrodes,unique([badImpedanceElecs,horzcat(badElecs{:})]));
 
@@ -326,7 +336,11 @@ if ~isempty(electrodeNum)
     elseif strcmpi(arrayType,'Dual')
         electrodes_temp = intersect(cell2mat(TotalElecs{idate}),electrodeNum);
         if strcmpi(arraysToSave,'V1')
-            electrodeList{1} = intersect(electrodes_temp,1:48);
+            if strcmpi(monkeyName,'jojo')
+                electrodeList{1} = intersect(electrodes_temp,49:96);
+            else
+                electrodeList{1} = intersect(electrodes_temp,1:48);
+            end
         elseif strcmpi(arraysToSave,'V4')
             electrodeList{1} = intersect(electrodes_temp,49:96);
         elseif strcmpi(arraysToSave,'Both')

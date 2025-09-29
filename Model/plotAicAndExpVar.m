@@ -54,26 +54,28 @@ for iplot = 1:2
         plotHandle1 = plotHandles_j;
         plotHandle2 = plotHandles_k;
         plotHandle3 = plotHandles_l;
-        BinNum = 15;
-        BinAx = -1000:100:400;
+        BinNum = 21;
+        BinAx = -1000:100:1000;
         labelString = 'Akaike Information Criteria';
-        limits = [-1000 400];
-        x_ax_val = 0;
-        y_ax_val1 = -860; 
-        y_ax_val2 = -930;
+        limits = [-1000 800];
+        x_ax_val = 275;
+        y_ax_val1 = -800; 
+        y_ax_val2 = -900;
         tailSide = 'both';
     end
     
     subplot(plotHandle1)
     colorArray = [0.7 0.03 0.3;1 0.54 0.15]; 
-    Markers = {'o','square','^'};
+    Markers = {'o','square','^','d','pentagram'};
     plot(-200:1:-195,-200:1:-195,'-','color',colorArray(1,:),'lineWidth',2.5);
     hold on;
     plot(-200:1:-195,-200:1:-195,'-','color',colorArray(2,:),'lineWidth',2.5);
     hold on;
-    scatter(-10000,-10000,1000,'filled','Marker',Markers{1},'MarkerFaceAlpha',0.6,'MarkerFaceColor','k');hold on;
-    scatter(-10000,-10000,1000,'filled','Marker',Markers{2},'MarkerFaceAlpha',0.6,'MarkerFaceColor','k');hold on;
-    scatter(-10000,-10000,1000,'filled','Marker',Markers{3},'MarkerFaceAlpha',0.6,'MarkerFaceColor','k');hold on;
+    scatter(-10000,-10000,1,'filled','Marker',Markers{1},'MarkerFaceAlpha',0.6,'MarkerFaceColor','k');hold on;
+    scatter(-10000,-10000,1,'filled','Marker',Markers{2},'MarkerFaceAlpha',0.6,'MarkerFaceColor','k');hold on;
+    scatter(-10000,-10000,1,'filled','Marker',Markers{3},'MarkerFaceAlpha',0.6,'MarkerFaceColor','k');hold on;
+    scatter(-10000,-10000,1,'filled','Marker',Markers{4},'MarkerFaceAlpha',0.6,'MarkerFaceColor','k');hold on;
+    scatter(-10000,-10000,1,'filled','Marker',Markers{5},'MarkerFaceAlpha',0.6,'MarkerFaceColor','k');hold on;
     for idel = 1:size(scatterData,2)
         for imonkey = 1:size(scatterData,1)  
             clearvars mod1_x mod2_y
@@ -88,9 +90,8 @@ for iplot = 1:2
     ylabel(Y_Label);xlabel(X_Label);
     xlim(limits);ylim(limits);
     plot(limits,limits,'k:','lineWidth',1.2);
-    legend('Delta 0','Delta 90','M1','M2','M3','location','northwest','Fontname','courier','Fontsize',13,'FontWeight','bold');
-    
-    
+    legend('Delta 0','Delta 90','M1-LFP','M2-LFP','M3-ECoG','M1 and M2-MUA','M2 and M4-EEG','location','northwest','Fontname','courier','Fontsize',13,'FontWeight','bold');
+    legend('boxoff')
     %%% checking significance --
 
     [del_0_p,~] = signrank(histData{1}(:,1),histData{1}(:,2),'tail',tailSide);
@@ -120,9 +121,9 @@ for iplot = 1:2
         ylim([0 1]);yticks(0:0.1:1)
         xlim([0 40]);yticklabels({'0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1'});
     else
-        ylim([-1000 400]);yticks(-1000:200:400)
-        xlim([0 20]);
-        yticklabels({'-1000','-800','-600','-400','-200','0','200','400'});
+        ylim([-1000 800]);yticks(-1000:200:1000)
+        xlim([0 18]);
+        yticklabels({'-1000','-800','-600','-400','-200','0','200','400','600','800','1000'});
     end
     
     box off; set(gca, 'color', 'none');
@@ -137,13 +138,13 @@ for iplot = 1:2
     histogram(mod1_90,BinNum,'BinEdges',BinAx,'Orientation','vertical','FaceColor',colorArray(2,:),'FaceAlpha',0.2,'EdgeColor',colorArray(2,:),'LineWidth',1.5);
     
     if iplot == 1
-        xlim([0 1]);ylim([0 30]);
+        xlim([0 1]);ylim([0 25]);
         xticklabels({'0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1'});
         xticks(0:0.1:1);yticks(0:10:20);
     else
-        xlim([-1000 400]);ylim([0 20]);
-        xticks(-1000:200:400);
-        xticklabels({'-1000','-800','-600','-400','-200','0','200','400'});
+        xlim([-1000 800]);ylim([0 15]);
+        xticks(-1000:200:1000);
+        xticklabels({'-1000','-800','-600','-400','-200','0','200','400','600','800','1000'});
     end
     
     box off; set(gca, 'color', 'none');

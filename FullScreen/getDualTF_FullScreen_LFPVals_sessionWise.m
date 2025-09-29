@@ -1,10 +1,10 @@
-function [Results] =getDualTF_FullScreen_LFPVals_sessionWise(Indices,folderSourceString,gridType,timeRange,useERP,commonBaselineFlag,useCommonBadTrials,dcShiftCorrectionFlag,folderHighRMSElecs)
+function [Results] =getDualTF_FullScreen_LFPVals_sessionWise(Indices,folderSourceString,gridType,timeRange,useERP,commonBaselineFlag,useCommonBadTrials,dcShiftCorrectionFlag,folderHighRMSElecs,MaskFreqsToUse)
 
 if ~exist('useERP','var');                                         useERP = 0;                                       end
 if ~exist('commonBaselineFlag','var');                commonBaselineFlag = 0;               end
 if ~exist('useCommonBadTrials','var');               useCommonBadTrials = 1;              end
 if ~exist('dcShiftCorrectionFlag','var');               dcShiftCorrectionFlag =0;               end
-
+if ~exist('MaskFreqsToUse','var');                       MaskFreqsToUse =1:2:29;               end
 % getting all experiment dates and names
 [~,monkeyNames,expDates,protocolNames,~,arrayTypes,arraysToSave] = allProtocolsMonkeys;
 
@@ -24,7 +24,7 @@ for ind = 1:length(Indices) % running it for all protocol indices
     monkeyName = monkeyNames{Indices(ind)};
     expDate = expDates{Indices(ind)};
     protocolName = protocolNames{Indices(ind)};
-    arrayType =  arrayTypes{Indices(ind)};           
+    arrayType =  arrayTypes{Indices(ind)};
     arrayToSave = arraysToSave{Indices(ind)};
     
     folderName = fullfile(folderSourceString,'data',monkeyName,gridType,expDate,protocolName);
@@ -52,7 +52,7 @@ for ind = 1:length(Indices) % running it for all protocol indices
     
     if strcmp(arrayType,'Dual')
         if strcmpi(arrayToSave,'V1')
-            electrodeList{1} = intersect(electrodeNums,1:48);
+           electrodeList{1} = intersect(electrodeNums,1:48);  
         elseif  strcmpi(arrayToSave,'V4')
             electrodeList{1} = intersect(electrodeNums,49:96);
         elseif strcmpi(arrayToSave,'Both')
@@ -76,10 +76,11 @@ for ind = 1:length(Indices) % running it for all protocol indices
     count = length(freqbins); % N - length of fft
     
     %index for Target and Mask Frequency
-    fid_MaskFreq = zeros(1,length(Results.parameters{ind}.tValsUnique2));
+    fid_MaskFreq = zeros(1,length(MaskFreqsToUse));
     fid_TargetFreq = freqbins == 2*Results.parameters{ind}.tValsUnique;
-    for j = 1:length(Results.parameters{ind}.tValsUnique2)
-        fid_MaskFreq(j) = find(freqbins == 2*Results.parameters{ind}.tValsUnique2(j));
+    
+    for j = 1:length(MaskFreqsToUse)
+        fid_MaskFreq(j) = find(freqbins == 2*MaskFreqsToUse(j));
     end
     
     % stimulus and baseline period
@@ -125,26 +126,32 @@ for ind = 1:length(Indices) % running it for all protocol indices
             end
             
             for del = 1:length(Delta)
-                if Delta(del) == 0
+                
+                if length(Delta) == 1
                     order = 1;
-                elseif Delta(del) == 90
-                    order = 2;
+                else
+                    if Delta(del) == 0
+                        order = 1;
+                    elseif Delta(del) == 90
+                        order = 2;
+                    end
                 end
-                for t = 1:length(Results.parameters{ind}.tValsUnique2)
+                
+                for t = 1:length(MaskFreqsToUse)
                     % grating case - left side at 0 %
                     clearvars trialNums
                     trialNums = Results.parameters{ind}.parameterCombinations{1,1,1,1,1,1,1};
-                    trialNums = intersect(trialNums,Results.parameters{ind}.parameterCombinations2{1,1,1,1,del,1,t});
+                    trialNums = intersect(trialNums,Results.parameters{ind}.parameterCombinations2{1,1,1,1,del,1,MaskFreqsToUse(t)}); % in dona and coco - right side contrast is always 50%
                     if useCommonBadTrials
                         trialNums = setdiff(trialNums,badTrials{1,iArray});
                     else
                         trialNums = setdiff(trialNums,badTrials{1,iArray}{1,electrodeList{iArray}(ielec)});
                     end
                     analogDataAllGra{del,t} = analogData(trialNums,:);
-                    % plaid case - left side at 50%
+                    % plaid case - left side at max contrast%
                     clearvars trialNums
                     trialNums = Results.parameters{ind}.parameterCombinations{1,1,1,1,1,2,1};
-                    trialNums = intersect(trialNums,Results.parameters{ind}.parameterCombinations2{1,1,1,1,del,1,t});
+                    trialNums = intersect(trialNums,Results.parameters{ind}.parameterCombinations2{1,1,1,1,del,1,MaskFreqsToUse(t)});
                     if useCommonBadTrials
                         trialNums = setdiff(trialNums,badTrials{1,iArray});
                     else
@@ -168,7 +175,11 @@ for ind = 1:length(Indices) % running it for all protocol indices
             end
             
             for o = 1:length(Delta)
-                for t = 1:length(Results.parameters{ind}.tValsUnique2)
+                
+                ElecSaveOrder = electrodeList{iArray}(ielec);
+                oriOrder = o;
+
+                for t = 1:length(MaskFreqsToUse)
                     
                     % combining grating data across orientations %
                     clearvars conGra allOriGratingData
@@ -210,26 +221,30 @@ for ind = 1:length(Indices) % running it for all protocol indices
                         end
                     end
                     
+                    
                     %Results for plaid case
-                    Results.fftST_plaid{iArray}(SessionCount,electrodeList{iArray}(ielec),o,t,:) = fftST_plaid;            %fft stimulus
-                    Results.fftBL_plaid{iArray}(SessionCount,electrodeList{iArray}(ielec),o,t,:) = fftBL_plaid;            %fft baseline
+                    Results.fftST_plaid{iArray}(SessionCount,ElecSaveOrder,oriOrder,t,:) = fftST_plaid;            %fft stimulus
+                    Results.fftBL_plaid{iArray}(SessionCount,ElecSaveOrder,oriOrder,t,:) = fftBL_plaid;            %fft baseline
                     temp_plaid =  fftST_plaid-fftBL_plaid;
-                    Results.ampdiff_plaid{iArray}(SessionCount,electrodeList{iArray}(ielec),o,t) = temp_plaid(fid_TargetFreq); % change in amplitude plaid case
+                    Results.ampdiff_plaid{iArray}(SessionCount,ElecSaveOrder,oriOrder,t) = temp_plaid(fid_TargetFreq); % change in amplitude plaid case
                     %Results for grating case
-                    Results.fftST_grating{iArray}(SessionCount,electrodeList{iArray}(ielec),o,t,:) = fftST_grating;           %fft stimulus
-                    Results.fftBL_grating{iArray}(SessionCount,electrodeList{iArray}(ielec),o,t,:) = fftBL_grating;           %fft baseline
+                    Results.fftST_grating{iArray}(SessionCount,ElecSaveOrder,oriOrder,t,:) = fftST_grating;           %fft stimulus
+                    Results.fftBL_grating{iArray}(SessionCount,ElecSaveOrder,oriOrder,t,:) = fftBL_grating;           %fft baseline
                     temp_grating =  fftST_grating- fftBL_grating;
-                    Results.ampdiff_grating{iArray}(SessionCount,electrodeList{iArray}(ielec),o,t) = temp_grating(fid_MaskFreq(t));
+                    Results.ampdiff_grating{iArray}(SessionCount,ElecSaveOrder,oriOrder,t) = temp_grating(fid_MaskFreq(t));
                     clearvars fftST_plaid fftBL_plaid temp_plaid fftBL_grating fftST_grating temp_grating
                 end
+                
+                
+                %%%%%% subtracting change in amplitude for plaid case from grating
+                %%%%%% case
+                clear gratingCaseAmp plaidCaseAmp
+                selectedFreq = MaskFreqsToUse == Results.parameters{ind}.tValsUnique;
+                gratingCaseAmp = Results.ampdiff_grating{iArray}(SessionCount,ElecSaveOrder,oriOrder,selectedFreq);
+                Results.ChangeInAmpNeg{iArray}(SessionCount,ElecSaveOrder,oriOrder,:) = Results.ampdiff_plaid{iArray}(SessionCount,ElecSaveOrder,oriOrder,:) - repmat(gratingCaseAmp,1,1,1,size(Results.ampdiff_plaid{iArray},4));
+                
+                
             end
-            
-            %%%%%% subtracting change in amplitude for plaid case from grating
-            %%%%%% case
-            clear gratingCaseAmp plaidCaseAmp
-            selectedFreq = Results.parameters{ind}.tValsUnique2 == Results.parameters{ind}.tValsUnique;
-            gratingCaseAmp = mean(Results.ampdiff_grating{iArray}(SessionCount,electrodeList{iArray}(ielec),:,selectedFreq));
-            Results.ChangeInAmpNeg{iArray}(SessionCount,electrodeList{iArray}(ielec),:,:) = Results.ampdiff_plaid{iArray}(SessionCount,electrodeList{iArray}(ielec),:,:) - repmat(gratingCaseAmp,1,1,size(Results.ampdiff_plaid{iArray},3),size(Results.ampdiff_plaid{iArray},4));
         end
     end
     SessionCount = SessionCount+1;

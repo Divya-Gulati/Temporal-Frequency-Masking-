@@ -5,13 +5,13 @@ filepath = 'E:\MonkeyData_DualTFSmallPaper\savedData';
 destination = ("E:\MonkeyData_DualTFSmallPaper\savedData\Model");%
 
 load(fullfile(filepath,'SmallStimPlaid_HighRMSLFP_sessionWise_fortyFive_Microelectrode.mat'));
-badElecs = {[],[];[],[];[],[]};
+badElecs = {[],[];[],[];[],[];[],[]};
 
 % Parameters
 cList = [0 0.0625 0.125 0.25];%contrast
 tfList = 1:2:29;%TF
 dList = 45;%Delta
-MonkeyID = {'M2','M3'};
+MonkeyID = {'M2','M3'}; %M2- LFP,  M3-ECoG
 TargetFrequency = 15;
 maskTFList = [1:2:13 17:2:29];
 
@@ -32,6 +32,7 @@ for iMonkey = 1:size(Results,2)
     end
 end
 clearvars Results
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -99,8 +100,8 @@ for modelNum = 1:2
                 
                 clearvars params ef
                 while true
-                    [params,~,ef,~] = fmincon(@(params) getResponsefit(params,cList,dataToBeFitted,modelNum,TargetFrequency,maskTFList),startPoint,[],[],[],[],lowerbound,upperbound,[],opts);
-                    [errorResidual{iMon,idel}(ielec,:),estData{iMon,idel}(ielec,:,:,:)] = getResponsefit(params,cList,dataToBeFitted,modelNum,TargetFrequency,maskTFList);
+                    [params,~,ef,~] = fmincon(@(params) getResponsefit(params,cList,cList,dataToBeFitted,modelNum,TargetFrequency,maskTFList),startPoint,[],[],[],[],lowerbound,upperbound,[],opts);
+                    [errorResidual{iMon,idel}(ielec,:),estData{iMon,idel}(ielec,:,:,:)] = getResponsefit(params,cList,cList,dataToBeFitted,modelNum,TargetFrequency,maskTFList);
                     if isreal(params) && isreal(estData{iMon,idel}(ielec,:,:,:)) %&& ef == 1
                         break;
                     end

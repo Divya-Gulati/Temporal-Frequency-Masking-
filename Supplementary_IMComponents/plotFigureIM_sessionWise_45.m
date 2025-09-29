@@ -27,7 +27,7 @@ for iori = 1:length(FigureData.NumElecs_ECoG)
         
         if iscale == 1
             namea = '';
-            NumElec = FigureData.NumElecs_M1;
+            NumElec = FigureData.NumElecs_Small_BothMonkeysMerged;
         else
             namea = '_ECoG';
             NumElec = FigureData.NumElecs_ECoG;
@@ -64,7 +64,7 @@ for iori = 1:length(FigureData.NumElecs_ECoG)
             xline(15+TF(iTF),':','Linewidth',2,'color',[184 115 51]./255);
             xline(abs(15-TF(iTF)),':','Linewidth',2,'color',[92 64 51]./255);
             xticks([0 20 40 60]);
-            yticks([0 10 20 30]);
+            yticks([0 9 18 27]);
             
             if iTF~=length(TF)
                 set(gca,'YTickLabel',[]);
@@ -121,7 +121,7 @@ for iori = 1:length(FigureData.NumElecs_ECoG)
                     hold on;
                 end
                 limits_y = [MinScaleIMM-2 ceil(MaxScaleIMM)+8];
-                set(gca,'FontSize',9);ylim(limits_y);xticks(1:4:29);
+                set(gca,'FontSize',9);ylim(limits_y);xticks(1:4:29);yticks([-8 0 8 16 24 32])
                 if iscale ~= 2 && iTarCon ~=1
                     set(gca,'YTickLabel',[])
                 end
@@ -135,7 +135,7 @@ for iori = 1:length(FigureData.NumElecs_ECoG)
                 end
                 
                 if imPlot == 2 && iscale == 1 && iTarCon ==1
-                    legend('0','6.25','12.5','25','FontSize',6,'Fontname','Courier','Fontweight','bold','location','northeast');
+                    legend('0','6.25','12.5','25','FontSize',6,'Fontname','Courier','Fontweight','bold','location','northwest','box','off');
                 end
                 
                 if iscale == 2 && iTarCon ==1
@@ -151,10 +151,10 @@ for iori = 1:length(FigureData.NumElecs_ECoG)
                 end
                 if iTarCon == length(ContrastValuesLeft)
                     if iscale == 1
-                        h = text(32,floor(MinScaleIMM)+1,'M2-Microelectrode','Fontsize',8,'Fontname','Courier','Fontweight','bold','color','k');
+                        h = text(32,((mean(limits_y))-5),'M2- LFP','Fontsize',9,'Fontname','Courier','Fontweight','bold','color','k');
                         set(h,'Rotation',90);
                     else
-                        h = text(32,[(mean(limits_y))-3.5],'M3 - ECoG','Fontsize',8,'Fontname','Courier','Fontweight','bold','color','k');
+                        h = text(32,((mean(limits_y))-5),'M3 - ECoG','Fontsize',9,'Fontname','Courier','Fontweight','bold','color','k');
                         set(h,'Rotation',90);
                     end
                 end
@@ -167,8 +167,8 @@ for iori = 1:length(FigureData.NumElecs_ECoG)
 end
 
 annotation(gcf,'textarrow',...
-    [0.19 0.1] ,[0.937 0.5],...
-    'String','Delta 45', 'HeadStyle', 'none', 'LineStyle', 'none',...
+    [0.21 0.1] ,[0.937 0.5],...
+    'String',['45' char(176) 'separated Plaids'], 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',16, 'color',colorArray(2,:),'FontWeight','bold', 'TextRotation',0,'Fontname','courier');
 
 annotation(gcf,'textarrow',...

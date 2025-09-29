@@ -1,31 +1,28 @@
-function plotFigure_Supplementary_FortyFive_sessionWise(Figure_Data,dataType,GoodFitsData,ModelNames,TargetTF,TFList)
+function plotFigure_Supplementary_FortyFive_sessionWise(Figure_Data,GoodFitsData,ModelNames,TargetTF,TFList)
 TF = 1:2:29;
 ContrastValuesLeft = [0,6.25,12.5,25];
 ContrastValuesRight = [0,6.25,12.5,25];
 uniquedeltaChange = 45;
-labels = {'M2 - Microelectrode','M3 - ECoG'};
-if contains(dataType,'ampDiff')
-    PlaidAvgECoG = Figure_Data.ampDiff_plaid_ECoG_mean;
-    PlaidSemECoG = Figure_Data.ampDiff_plaid_ECoG_sem;
-    PlaidAvgM1 = Figure_Data.ampDiff_plaid_mean_M1;
-    PlaidSemM1 = Figure_Data.ampDiff_plaid_sem_M1;
-elseif contains(dataType,'Subtract')
-    PlaidAvgECoG = Figure_Data.changeInAmpSubtract_ECoG_mean;
-    PlaidSemECoG = Figure_Data.changeInAmpSubtract_ECoG_sem;
-    PlaidAvgM1 = Figure_Data.changeInAmpSubtract_mean_M1;
-    PlaidSemM1 = Figure_Data.changeInAmpSubtract_sem_M1;
-end
+labels = {'M2 - LFP','M3 - ECoG'};
+
+PlaidAvgECoG = Figure_Data.ampDiff_plaid_ECoG_mean;
+PlaidSemECoG = Figure_Data.ampDiff_plaid_ECoG_sem;
+PlaidAvgM1 = Figure_Data.ampDiff_plaid_mean_M1;
+PlaidSemM1 = Figure_Data.ampDiff_plaid_sem_M1;
 
 colorArray1 = winter(4);
 colorArray2 = [0.85 0.3 0.2];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 f = figure;
 f.WindowState = 'maximized';
-plotHandles_a= getPlotHandles(2,4,[0.04 0.08 0.35 0.83],0.007,0.1,0);
-plotHandles_b= getPlotHandles(2,4,[0.46 0.545 0.36 0.367],0.007,0.03,0);
-plotHandles_c= getPlotHandles(2,1,[0.86 0.545 0.09 0.367],0.007,0.03,0);
-plotHandles_d= getPlotHandles(2,4,[0.46 0.08 0.36 0.367],0.007,0.03,0);
-plotHandles_e= getPlotHandles(2,1,[0.86 0.08 0.09 0.367],0.007,0.03,0);
+plotHandles_a= getPlotHandles(2,4,[0.04 0.06 0.35 0.85],0.007,0.02,0);
+
+plotHandles_b= getPlotHandles(2,4,[0.455 0.545 0.375 0.367],0.007,0.02,0);
+plotHandles_c= getPlotHandles(2,1,[0.86 0.545 0.09 0.367],0.007,0.02,0);
+
+plotHandles_d= getPlotHandles(2,4,[0.455 0.08 0.375 0.367],0.007,0.02,0);
+plotHandles_e= getPlotHandles(2,1,[0.86 0.08 0.09 0.367],0.007,0.02,0);
+
 
 
 for iMonkey = 1:2
@@ -51,7 +48,7 @@ for iMonkey = 1:2
             newDefaultColors = colorArray;
             newColors = flipud(newDefaultColors);
             set(gca, 'ColorOrder', newColors, 'NextPlot', 'replacechildren');
-            set(gca,'FontSize',12);ylim([0 ceil(MaxScale)+3]);xticks(1:4:29);
+            set(gca,'FontSize',12);ylim([-1 ceil(MaxScale)+3]);xticks(1:4:29);
             
             for iConRight = 1:length(ContrastValuesRight)
                 errorbar(TF,squeeze(ChngeInAmpData(ioriDelta,iConLeft,iConRight,:)),...
@@ -64,10 +61,10 @@ for iMonkey = 1:2
                 text(16,ceil(MaxScale) +2,elecNum,'Fontsize',12,'Fontname','Courier','Fontweight','bold');
             end
             
-% 
-%             if iMonkey ~= 2
-%                 set(gca,'XTickLabel',[])
-%             end
+            
+            if iMonkey ~= 2
+                set(gca,'XTickLabel',[])
+            end
             
             if  iConLeft ~=1
                 set(gca,'YTickLabel',[])
@@ -75,7 +72,7 @@ for iMonkey = 1:2
             
             if iMonkey == 2 && iConLeft ==1
                 if ioriDelta == 1
-                    legend('0','6.25','12.5','25','FontSize',9,'Fontname','Courier','Fontweight','bold');
+                    legend('0','6.25','12.5','25','FontSize',9,'Fontname','Courier','Fontweight','bold','location','northwest','box','off'); 
                 end
                 xlabel({'Temporal Frequency','of Mask (Hz)'},'FontSize',10);
                 ylabel('Change in Amplitude at 30Hz  (\muV)','FontSize',10);
@@ -85,10 +82,10 @@ for iMonkey = 1:2
             end
             if iConLeft == length(ContrastValuesLeft)
                 if iMonkey == 1
-                    h = text(32,3,labels{1},'Fontsize',11,'Fontname','Courier','Fontweight','bold','color','k');
+                    h = text(32,4,labels{iMonkey},'Fontsize',12,'Fontname','Courier','Fontweight','bold','color','k');
                     set(h,'Rotation',90);
                 else
-                    h = text(32,7,labels{2},'Fontsize',11,'Fontname','Courier','Fontweight','bold','color','k');
+                    h = text(32,7,labels{iMonkey},'Fontsize',12,'Fontname','Courier','Fontweight','bold','color','k');
                     set(h,'Rotation',90);
                 end
             end
@@ -104,7 +101,7 @@ for iModel = 1:size(GoodFitsData,2)
         if iMonkey == 1
             plotHandles_SupressionProfile = plotHandles_c;
             plotHandles_FitData = plotHandles_b;
-        else
+        elseif iMonkey == size(GoodFitsData{1, iModel}.goodParameters,1)
             plotHandles_SupressionProfile= plotHandles_e;
             plotHandles_FitData = plotHandles_d;
         end
@@ -141,7 +138,7 @@ for iModel = 1:size(GoodFitsData,2)
         maxScale = max(GoodFitsData{1, iModel}.mean_good_fitted_data(iMonkey,:,:,:,:)+GoodFitsData{1, iModel}.sem_good_fitted_data(iMonkey,:,:,:,:),[],'all');
         for iConL = 1:size(GoodFitsData{1, iModel}.mean_exp_obt_data,3)
             subplot(plotHandles_FitData(iModel,iConL))
-        newDefaultColors = winter(length(ContrastValuesLeft));
+            newDefaultColors = winter(length(ContrastValuesLeft));
             newgColors = flipud(newDefaultColors);
             for iConR = 1:length(ContrastValuesLeft)
                 plot(good_freqList,squeeze(GoodFitsData{1, iModel}.mean_exp_obt_data(iMonkey,1,iConL,iConR,:)),'o','color',newgColors(iConR,:),'lineWidth',2,'MarkerSize',4);
@@ -173,10 +170,10 @@ for iModel = 1:size(GoodFitsData,2)
                     newgColors(iConR,:),'EdgeColor','none','FaceColor',newgColors(iConR,:),'LineWidth',0.1, 'FaceAlpha',0.2);
             end
             
-            ylim([-0.1 maxScale+1])
-            xticks([1 5 9 13 17 21 25 29]);
+            ylim([-1 maxScale+1])
+            xticks([1 5 9 13 17 21 25 29]);xtickangle(90);
             
-            if iModel ~= size(GoodFitsData{1, iModel}.goodParameters,1)
+            if iModel ~= size(GoodFitsData,2)
                 set(gca,'xticklabels',[]);
             end
             
@@ -196,7 +193,7 @@ for iModel = 1:size(GoodFitsData,2)
             
             if iModel == size(GoodFitsData{1, iModel}.goodParameters,1)
                 if iConL == 1
-                    legend('0- Obs','6.25-Obs','12.5- Obs','25- Obs','0- Fit','6.25-Fit','12.5- Fit','25- Fit','Fontsize',7.5,'Location','best','Fontname','courier','Fontweight','bold');
+                    legend('0- Obs','6.25-Obs','12.5- Obs','25- Obs','0- Fit','6.25-Fit','12.5- Fit','25- Fit','Fontsize',7.5,'Location','best','Fontname','courier','Fontweight','bold','box','off');
                 end
             end
             
@@ -212,7 +209,7 @@ end
 
 
 annotation(gcf,'textarrow',...
-    [0.015 0.1] ,[0.91 0.5],...
+    [0.015 0.1] ,[0.915 0.5],...
     'String','A', 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',18, 'color','k','FontWeight','bold', 'TextRotation',0,'FontName','courier');
 
@@ -227,22 +224,22 @@ annotation(gcf,'textarrow',...
     'FontSize',18, 'color','k','FontWeight','bold', 'TextRotation',0,'FontName','courier');
 
 annotation(gcf,'textarrow',...
-    [0.21 0.1] ,[0.95 0.5],...
-    'String','Delta 45 - Observed Data', 'HeadStyle', 'none', 'LineStyle', 'none',...
+    [0.215 0.1] ,[0.955 0.5],...
+    'String',['45' char(176) 'separated Plaids - Observed Data'], 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',14, 'color','k','FontWeight','bold', 'TextRotation',0,'color','k','FontName','courier');
 
 annotation(gcf,'textarrow',...
-    [0.555 0.1] ,[0.965 0.5],...
-    'String','Delta 45 - Model Fits', 'HeadStyle', 'none', 'LineStyle', 'none',...
+    [0.52 0.1] ,[0.97 0.5],...
+    'String',['45' char(176) 'separated Plaids - Model Fits'], 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',14, 'color','k','FontWeight','bold', 'TextRotation',0,'color','k','FontName','courier');
 
 annotation(gcf,'textarrow',...
-    [0.865 0.1] ,[0.83 0.5],...
-    'String','M2-Microelectrode', 'HeadStyle', 'none', 'LineStyle', 'none',...
+    [0.935 0.1] ,[0.77 0.5],...
+    'String','M2-LFP', 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',13, 'color','k','FontWeight','bold', 'TextRotation',90,'color','k','FontName','courier');
 
 annotation(gcf,'textarrow',...
-    [0.93 0.1] ,[0.33 0.5],...
+    [0.925 0.1] ,[0.32 0.5],...
     'String','M3-ECoG', 'HeadStyle', 'none', 'LineStyle', 'none',...
     'FontSize',13, 'color','k','FontWeight','bold', 'TextRotation',90,'color','k','FontName','courier');
 

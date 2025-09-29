@@ -2,7 +2,7 @@ function PlotData = getAveragedModelData_AllMonkeys(expVarCutOff,modelNum,fileNa
 
 Data = load(fullfile(fileName),'exitflag','expVar','Parameters','estData','observedData','TargetFrequency','maskTFList');
 
-for iMonkey = 1:size(Data.exitflag,1)
+for iMonkey =1:size(Data.exitflag,1)
         MonkeyNum = iMonkey;
     for idel =1:size(Data.exitflag,2)
         clear lenElecs elecIDs
@@ -28,7 +28,8 @@ for iMonkey = 1:size(Data.exitflag,1)
         
         for iparam = 1:size(PlotData.goodParameters{iMonkey, idel},2)
             paramTocheck = PlotData.goodParameters{iMonkey, idel}(:,iparam);
-            SEMedian = getSEMedian(paramTocheck,32);
+            rng(1);
+            SEMedian = getSEMedian(paramTocheck,size(paramTocheck,1));
             PlotData.medianSE_goodParams(iMonkey, idel,iparam) = SEMedian;
         end
         
@@ -59,8 +60,8 @@ estSuppressionData = cell(size(GoodParameters,1),size(GoodParameters,2));
 mean_SuppressionProfile = double.empty([0 0 0]);
 sem_SuppressionProfile= double.empty([0 0 0]);
 
-for iMonkey = 1:size(GoodParameters,1)
-    for iDel= 1:size(GoodParameters,2)
+for iMonkey =1:size(GoodParameters,1)
+    for iDel=1:size(GoodParameters,2)
         for ilen = 1:size(GoodParameters{iMonkey,iDel},1)
 
             cutOff = GoodParameters{iMonkey,iDel}(ilen,end-3);

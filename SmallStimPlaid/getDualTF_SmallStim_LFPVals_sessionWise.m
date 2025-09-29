@@ -18,7 +18,7 @@ if ~exist('ImValFlag','var');                                     ImValFlag = 0;
 
 SessionCount = 1;
 
-for jIndex = 1:length(Indices) % running it for all protocol indices
+for jIndex =1:length(Indices) % running it for all protocol indices
     
     monkeyName = monkeyNames{Indices(jIndex)};
     expDate = expDates{Indices(jIndex)};
@@ -278,7 +278,7 @@ for jIndex = 1:length(Indices) % running it for all protocol indices
                 end
                 
                 Results.changeInAmpNeg(SessionCount,ElecSaveOrder,Con1,:,:)  = Results.ampDiff_plaid(SessionCount,ElecSaveOrder,Con1,:,:) - repmat(Results.ampDiff_plaid(SessionCount,ElecSaveOrder,1,4,freqTF),1,1,1,length(Results.parameters{jIndex}.cValsUnique2),length(Results.parameters{jIndex}.tValsUnique2));
-                Results.changeInAmpSubtract(SessionCount,ElecSaveOrder,Con1,:,:)  = Results.ampDiff_plaid(SessionCount,ElecSaveOrder,Con1,:,:) - repmat(Results.ampDiff_plaid(SessionCount,ElecSaveOrder,Con1,1,:) ,1,1,1,length(Results.parameters{jIndex}.cValsUnique2),1);
+                Results.changeInAmpSubtract(SessionCount,ElecSaveOrder,Con1,:,:)  = Results.ampDiff_plaid(SessionCount,ElecSaveOrder,Con1,:,:) - repmat(Results.ampDiff_plaid(SessionCount,ElecSaveOrder,Con1,1,freqTF),1,1,1,length(Results.parameters{jIndex}.cValsUnique2),length(Results.parameters{jIndex}.tValsUnique2));
                 
             end
         end
@@ -292,6 +292,8 @@ function [badTrials,badElecs] = getbadTrialsAndElecs(folderSegment,arrayType,use
 
 if strcmp(arrayType,'Dual')
     badTrialsandElecsFile{1} = fullfile(folderSegment,'badTrialsV1.mat');
+elseif strcmp(arrayType,'EEG')
+    badTrialsandElecsFile{1} = fullfile(folderSegment,'badTrialsEEG.mat');
 else
     badTrialsandElecsFile{1} = fullfile(folderSegment,'badTrials.mat');
 end

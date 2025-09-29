@@ -1,11 +1,11 @@
 clear; clc;
-folderSourceString = 'E:\MonkeyDataAnalysis\Plaid\';
+folderSourceString ='E:\MonkeyData_DualTFSmallPaper\savedData';
 FileName = "FigureFortyFiveSupplementary_FigureData_sessionWise.mat";
 fullFileName = fullfile(folderSourceString,FileName);
 load(fullFileName); 
 
 %%%%%%% calculating average parameters %%%%%%%%%
-filepath ='E:\MonkeyDataAnalysis\Model';%
+filepath ='E:\MonkeyData_DualTFSmallPaper\savedData\Model';%
 expVarCutOffs = {[0.8 0.8],[0.8 0.8]};
 fileString = 'Model_LFPData_for_all_elecs_FortyFivedelta_allSession_';
 
@@ -23,15 +23,14 @@ for imodelNums =1:2
    PlotData = getAveragedModelData_AllMonkeys(expVarCutOff,imodelNums,fileName);
    GoodFitsData{imodelNums} = PlotData;
    
-    save(fullfile(filepath,['PlotData_FortyFivedelta',ModelNames{imodelNums}]),'PlotData');
-    %run only first time then comment it
+    %save(fullfile(filepath,['PlotData_FortyFivedelta',ModelNames{imodelNums}]),'PlotData');
+    %%run only first time then comment it
 end
 
 TargetTF = 15;
 TFList = 1:2:29;
-dataType = 'ampDiff';
 Model_Names = {'Original Tuned','Optimal Tuned'};
-plotFigure_Supplementary_FortyFive_sessionWise(Figure_Data,dataType,GoodFitsData,Model_Names,TargetTF,TFList)
+plotFigure_Supplementary_FortyFive_sessionWise(Figure_Data,GoodFitsData,Model_Names,TargetTF,TFList)
 
 % saveFolder = 'D:\OneDrive - Indian Institute of Science\divya\MonkeyDataAnalysis\Figures_Final';
 % print(gcf,[saveFolder '\Figure_'],'-dtiff','-r600');

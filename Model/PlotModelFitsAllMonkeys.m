@@ -1,21 +1,21 @@
 function PlotModelFitsAllMonkeys(PlotData,TargetTF,TFList,ConList,DeltaList,modelNum)
 
 colorArray = [0.7 0.03 0.3; 1 0.54 0.15];
-labels = {'M1 - Microelectrode','M2 - Microelectrode','M3 - ECoG'};
+labels = {'M1 - LFP','M2 - LFP','M3 - ECoG','M1 & M2 - Spiking','M2 & M4 - EEG'};
 
 f = figure;
 f.WindowState = 'maximized';
-plotHandles_a= getPlotHandles(3,4,[0.04 0.08 0.28 0.80],0.001,0.03,0);
-plotHandles_b= getPlotHandles(3,1,[0.345 0.08 0.12 0.80],0.001,0.03,0);
+plotHandles_a= getPlotHandles(5,4,[0.04 0.07 0.285 0.85],0.003,0.015,0);
+plotHandles_b= getPlotHandles(5,1,[0.35 0.07 0.125 0.85],0.003,0.015,0);
 
-plotHandles_c= getPlotHandles(3,4,[0.53 0.08 0.28 0.80],0.001,0.03,0);
-plotHandles_d= getPlotHandles(3,1,[0.835 0.08 0.12 0.80],0.001,0.03,0);
+plotHandles_c= getPlotHandles(5,4,[0.535 0.07 0.285 0.85],0.003,0.015,0);
+plotHandles_d= getPlotHandles(5,1,[0.845 0.07 0.125 0.85],0.003,0.015,0);
 
 good_freqList = setdiff(TFList,TargetTF);
 tf_index = find(TFList == TargetTF);
 
 for iMonkey = 1:size(PlotData.goodParameters,1)
-    for idel=1:size(PlotData.goodParameters,2)
+    for idel =1:size(PlotData.goodParameters,2)
         if idel == 1
             plotHandles = plotHandles_b;
         else
@@ -49,7 +49,7 @@ for iMonkey = 1:size(PlotData.goodParameters,1)
         ax = gca;
         ax.YAxis(1).Color = 'k';
         ax.YAxis(2).Color = 'w';
-        ylabel(gca, labels(iMonkey) ,'Color','k','FontSize',11,'Fontname','courier','Fontweight','bold');
+        ylabel(gca, labels(iMonkey) ,'Color','k','FontSize',9.5,'Fontname','courier','Fontweight','bold');
         box off;
     end
     
@@ -66,21 +66,21 @@ for iMonkey = 1:size(PlotData.goodParameters,1)
             subplot(plotHandles(iMonkey,iConL))
             newDefaultColors = winter(length(ConList));
             newgColors = flipud(newDefaultColors);
-            for iConR = 1:length(ConList)
+            for iConR = 1:size(PlotData.mean_exp_obt_data,4)
                 plot(good_freqList,squeeze(PlotData.mean_exp_obt_data(iMonkey,iori,iConL,iConR,:)),'o','color',newgColors(iConR,:),'lineWidth',2,'MarkerSize',4);
                 hold on;
             end
-            for iConR = 1:length(ConList)
+            for iConR = 1:size(PlotData.mean_exp_obt_data,4)
                 hold on;
                 plot(good_freqList(1:tf_index-1),squeeze(PlotData.mean_good_fitted_data(iMonkey,iori,iConL,iConR,(1:tf_index-1))),':','color',newgColors(iConR,:),'lineWidth',2,'MarkerSize',4);
             end
             
-            for iConR = 1:length(ConList)
+            for iConR = 1:size(PlotData.mean_exp_obt_data,4)
                 hold on;
                 plot(good_freqList(tf_index:end),squeeze(PlotData.mean_good_fitted_data(iMonkey,iori,iConL,iConR,(tf_index:end))),':','color',newgColors(iConR,:),'lineWidth',2,'MarkerSize',4);
             end
             
-            for iConR = 1:length(ConList)
+            for iConR = 1:size(PlotData.mean_exp_obt_data,4)
                 hold on;
                 patch([good_freqList(1:tf_index-1) fliplr(good_freqList(1:tf_index-1))], ...
                     [squeeze(PlotData.mean_good_fitted_data(iMonkey,iori,iConL,iConR,(1:tf_index-1)))'-squeeze(PlotData.sem_good_fitted_data(iMonkey,iori,iConL,iConR,(1:tf_index-1)))'...
@@ -95,7 +95,7 @@ for iMonkey = 1:size(PlotData.goodParameters,1)
                     newgColors(iConR,:),'EdgeColor','none','FaceColor',newgColors(iConR,:),'LineWidth',0.1, 'FaceAlpha',0.2);
             end
             
-            ylim([-0.1 maxScale+1])
+            ylim([-0.5 maxScale+1])
             xticks([1 5 9 13 17 21 25 29]);
             
             if iMonkey ~= size(PlotData.goodParameters,1)
@@ -114,8 +114,11 @@ for iMonkey = 1:size(PlotData.goodParameters,1)
             
             if iMonkey == 1
                 title ("Target at " +ConList(iConL)*100 + "%",'Fontname','courier','Fontweight','bold','Fontsize',9);
+            end
+            
+            if iMonkey == 1%size(PlotData.goodParameters,1)
                 if iConL == 1
-                    legend('0- Obs','6.25- Obs','12.5- Obs','25- Obs','0- Fit','6.25- Fit','12.5- Fit','25- Fit','Fontsize',8,'Location','best','Fontname','courier','Fontweight','bold');
+                    legend('0- Obs','6.25- Obs','12.5- Obs','25- Obs','0- Fit','6.25- Fit','12.5- Fit','25- Fit','Fontsize',7,'Location','best','Fontname','courier','Fontweight','bold');legend('boxoff')
                 end
             end
             
@@ -130,22 +133,22 @@ for iMonkey = 1:size(PlotData.goodParameters,1)
 end
 
  annotation(gcf,'textarrow',...
-        [0.020 0.1] ,[0.898 0.5],...
+        [0.020 0.1] ,[0.94 0.5],...
         'String','A', 'HeadStyle', 'none', 'LineStyle', 'none',...
         'FontSize',18, 'color','k','FontWeight','bold', 'TextRotation',0,'Fontname','courier');
     
     annotation(gcf,'textarrow',...
-        [0.49 0.1] ,[0.914 0.5],...
+        [0.51 0.1] ,[0.96 0.5],...
         'String','B', 'HeadStyle', 'none', 'LineStyle', 'none',...
         'FontSize',18, 'color','k','FontWeight','bold', 'TextRotation',0,'Fontname','courier');
     
     annotation(gcf,'textarrow',...
-        [0.18 0.1] ,[0.93 0.5],...
+        [0.185 0.1] ,[0.945 0.5],...
         'String','Parallel', 'HeadStyle', 'none', 'LineStyle', 'none',...
         'FontSize',18, 'color','k','FontWeight','bold', 'TextRotation',0,'color','k','Fontname','courier');
     
     annotation(gcf,'textarrow',...
-        [0.625 0.1] ,[0.935 0.5],...
+        [0.63 0.1] ,[0.965 0.5],...
         'String','Orthogonal', 'HeadStyle', 'none', 'LineStyle', 'none',...
         'FontSize',18, 'color','k','FontWeight','bold', 'TextRotation',0,'color','k','Fontname','courier');
 end
